@@ -16,9 +16,19 @@ const PostFlag = sequelize.define('PostFlag', {
     },
     onDelete: 'CASCADE'
   },
+  reporter_id: {
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: {
+      model: 'users',
+      key: 'id'
+    },
+    onDelete: 'SET NULL'
+  },
   reason: {
-    type: DataTypes.TEXT,
-    allowNull: true
+    type: DataTypes.ENUM('spam', 'scam', 'fake', 'harassment', 'inappropriate', 'other'),
+    allowNull: false,
+    defaultValue: 'other'
   },
   details: {
     type: DataTypes.TEXT,
@@ -27,6 +37,11 @@ const PostFlag = sequelize.define('PostFlag', {
   reporter_ip: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+  status: {
+    type: DataTypes.ENUM('pending', 'resolved', 'dismissed'),
+    defaultValue: 'pending',
+    allowNull: false
   },
   is_resolved: {
     type: DataTypes.BOOLEAN,
@@ -38,6 +53,12 @@ const PostFlag = sequelize.define('PostFlag', {
   indexes: [
     {
       fields: ['post_id']
+    },
+    {
+      fields: ['reporter_id']
+    },
+    {
+      fields: ['status']
     }
   ]
 });

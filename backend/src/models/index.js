@@ -31,6 +31,9 @@ DonationImage.belongsTo(Donation, { foreignKey: 'donation_id', as: 'donation' })
 NeedPost.hasMany(PostFlag, { foreignKey: 'post_id', as: 'flags' });
 PostFlag.belongsTo(NeedPost, { foreignKey: 'post_id', as: 'post' });
 
+User.hasMany(PostFlag, { foreignKey: 'reporter_id', as: 'flags' });
+PostFlag.belongsTo(User, { foreignKey: 'reporter_id', as: 'reporter' });
+
 User.hasMany(Notification, { foreignKey: 'user_id', as: 'notifications' });
 Notification.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 

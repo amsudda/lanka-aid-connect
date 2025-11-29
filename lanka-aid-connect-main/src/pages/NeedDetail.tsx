@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ReportModal } from "@/components/modals/ReportModal";
 import { postsAPI, donationsAPI, authAPI } from "@/services/api";
 import { NeedPost, Donation, CATEGORY_LABELS, CATEGORY_ICONS, NeedCategory } from "@/types/database";
 import {
@@ -46,6 +47,7 @@ export default function NeedDetail() {
   const [proofImages, setProofImages] = useState<File[]>([]);
   const [proofPreviews, setProofPreviews] = useState<string[]>([]);
   const [user, setUser] = useState<any>(null);
+  const [reportOpen, setReportOpen] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -565,10 +567,24 @@ export default function NeedDetail() {
         </div>
 
         {/* Flag */}
-        <Button variant="ghost" className="w-full text-muted-foreground">
+        <Button
+          variant="ghost"
+          className="w-full text-muted-foreground"
+          onClick={() => setReportOpen(true)}
+        >
           <Flag className="w-4 h-4 mr-2" />
           Report this post
         </Button>
+
+        {/* Report Modal */}
+        {post && (
+          <ReportModal
+            isOpen={reportOpen}
+            onClose={() => setReportOpen(false)}
+            postId={post.id}
+            postTitle={post.title}
+          />
+        )}
       </div>
     </PageLayout>
   );
