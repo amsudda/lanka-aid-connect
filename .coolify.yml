@@ -1,0 +1,7 @@
+# Coolify Configuration
+# This file tells Coolify how to deploy the application
+
+volumes:
+  - source: /data/coolify/lanka-aid/uploads
+    target: /app/backend/uploads
+    type: bind

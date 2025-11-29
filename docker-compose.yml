@@ -46,6 +46,7 @@ services:
       GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
       SESSION_SECRET: ${SESSION_SECRET:-your-session-secret-change-in-production}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
+      UPLOAD_PATH: /app/uploads
     depends_on:
       db:
         condition: service_healthy
