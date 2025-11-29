@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Heart, HandHelping } from "lucide-react";
@@ -8,10 +8,27 @@ export default function SelectUserType() {
   const navigate = useNavigate();
   const [selectedType, setSelectedType] = useState<"donor" | "requester" | null>(null);
 
+  useEffect(() => {
+    // Check if user is already authenticated
+    const authToken = localStorage.getItem("auth_token");
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlToken = urlParams.get('token');
+
+    // If already authenticated (has token in storage or URL), redirect to profile
+    if (authToken || urlToken) {
+      console.log("User already authenticated, redirecting to profile");
+      navigate("/profile", { replace: true });
+    }
+  }, [navigate]);
+
   const handleContinue = () => {
     if (!selectedType) return;
 
-    // Store the user type selection
+    // Clear any old user type data before selecting new type
+    localStorage.removeItem("user_type");
+    localStorage.removeItem("selected_user_type");
+
+    // Store the new user type selection
     localStorage.setItem("selected_user_type", selectedType);
 
     // Redirect to Google auth with user type

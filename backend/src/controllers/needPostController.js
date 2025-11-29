@@ -101,6 +101,10 @@ export const getNeedPost = async (req, res, next) => {
 
 export const createNeedPost = async (req, res, next) => {
   try {
+    console.log('📝 Create Post - User authenticated:', !!req.user);
+    console.log('📝 Create Post - User ID:', req.user?.id);
+    console.log('📝 Create Post - Auth header present:', !!req.headers.authorization);
+
     const {
       victim_name,
       phone_number,

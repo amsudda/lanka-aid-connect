@@ -184,7 +184,7 @@ export const postsAPI = {
     const url = `${API_BASE_URL}${API_ENDPOINTS.POSTS}`;
     const response = await fetch(url, {
       method: 'POST',
-      headers: createHeaders(false, true),
+      headers: createHeaders(true, true), // Changed to true to include auth token
       body: formData,
     });
     const result = await handleResponse<{ success: boolean; data: NeedPost; pin: string }>(response);

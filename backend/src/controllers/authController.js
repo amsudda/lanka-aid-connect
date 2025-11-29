@@ -12,17 +12,18 @@ const generateToken = (id) => {
 export const googleCallback = async (req, res, next) => {
   try {
     console.log('OAuth Callback - User:', req.user?.email);
-    console.log('OAuth Callback - Session userType:', req.session.userType);
+    console.log('OAuth Callback - userType from req:', req.userTypeFromState);
     console.log('OAuth Callback - User current user_type:', req.user?.user_type);
 
     const token = generateToken(req.user.id);
-    const userType = req.session.userType;
+    const userType = req.userTypeFromState; // Read from req object instead of session
     const isNewUser = !req.user.user_type;
 
     console.log('OAuth Callback - Is new user?', isNewUser);
 
-    // Save user type if provided
-    if (userType && !req.user.user_type) {
+    // IMPORTANT: Always update user type if provided in session
+    // This allows users to change their type when they log back in
+    if (userType) {
       console.log('OAuth Callback - Updating user with type:', userType);
       await req.user.update({
         user_type: userType,
@@ -39,24 +40,18 @@ export const googleCallback = async (req, res, next) => {
 
     // Determine redirect path based on user type
     const finalUserType = req.user.user_type || userType;
-    let redirectPath = '/';
+    let redirectPath = '/profile'; // Default to profile page
 
     console.log('OAuth Callback - Final user type:', finalUserType);
 
-    // If new user, redirect based on their type
-    if (isNewUser && finalUserType) {
-      if (finalUserType === 'requester') {
-        redirectPath = '/post';
-        console.log('OAuth Callback - Redirecting requester to /post');
-      } else if (finalUserType === 'donor') {
-        redirectPath = '/';
-        console.log('OAuth Callback - Redirecting donor to /');
-      }
-    } else if (!finalUserType) {
-      // If no user type at all, send to select-type
+    // If no user type at all, send to select-type
+    if (!finalUserType) {
       console.log('OAuth Callback - No user type, redirecting to /select-type');
       return res.redirect(`${redirectUrl}/select-type`);
     }
+
+    // Redirect to profile page after authentication
+    console.log('OAuth Callback - Redirecting to profile');
 
     const fullRedirectUrl = `${redirectUrl}${redirectPath}?token=${token}&userType=${finalUserType}`;
     console.log('OAuth Callback - Full redirect URL:', fullRedirectUrl);
