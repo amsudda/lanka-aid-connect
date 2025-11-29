@@ -134,6 +134,11 @@ export class APIError extends Error {
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: response.statusText }));
+    // Handle express-validator errors array
+    if (error.errors && Array.isArray(error.errors)) {
+      const errorMessages = error.errors.map((e: any) => e.msg).join(', ');
+      throw new APIError(response.status, errorMessages);
+    }
     throw new APIError(response.status, error.message || 'An error occurred');
   }
   return response.json();

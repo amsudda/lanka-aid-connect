@@ -216,8 +216,34 @@ export default function PostNeed() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validate required fields
+    if (!formData.victim_name.trim()) {
+      toast.error("Please enter your name");
+      return;
+    }
+
+    if (!formData.phone_number.trim()) {
+      toast.error("Please enter your phone number");
+      return;
+    }
+
+    if (!formData.location_district) {
+      toast.error("Please select your district");
+      return;
+    }
+
     if (selectedCategories.length === 0) {
       toast.error("Please select at least one category");
+      return;
+    }
+
+    if (!formData.title.trim()) {
+      toast.error("Please enter a title");
+      return;
+    }
+
+    if (!formData.description.trim()) {
+      toast.error("Please enter a description");
       return;
     }
 
