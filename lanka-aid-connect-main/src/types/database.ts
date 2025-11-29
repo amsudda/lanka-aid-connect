@@ -32,14 +32,31 @@ export interface PostImage {
   created_at: string;
 }
 
+export interface DonationImage {
+  id: string;
+  donation_id: string;
+  image_url: string;
+  display_order: number;
+}
+
 export interface Donation {
   id: string;
   post_id: string;
   donor_id: string | null;
   donor_name: string;
+  donor_phone?: string | null;
   quantity: number;
+  item_description?: string | null;
   message: string | null;
+  status: 'pledged' | 'in_transit' | 'delivered' | 'fulfilled';
+  fulfilled_at?: string | null;
   created_at: string;
+  images?: DonationImage[];
+  donor?: {
+    id: string;
+    full_name: string | null;
+    avatar_url: string | null;
+  };
 }
 
 export interface DonorProfile {

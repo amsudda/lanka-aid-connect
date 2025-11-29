@@ -133,16 +133,44 @@ export const getDonationsByPost = async (req, res, next) => {
   try {
     const { id: postId } = req.params;
 
+    // Get the post to check if current user is the owner
+    const post = await NeedPost.findByPk(postId);
+    const isOwner = req.user && post && post.user_id === req.user.id;
+
     const donations = await Donation.findAll({
       where: { post_id: postId },
+      include: [
+        {
+          model: db.DonationImage,
+          as: 'images',
+          attributes: ['id', 'image_url', 'display_order']
+        },
+        {
+          model: db.User,
+          as: 'donor',
+          attributes: ['id', 'full_name', 'avatar_url']
+        }
+      ],
       order: [['created_at', 'DESC']],
-      attributes: ['id', 'donor_name', 'quantity', 'message', 'created_at']
+      attributes: [
+        'id',
+        'donor_name',
+        // Only show phone to post owner
+        ...(isOwner ? ['donor_phone'] : []),
+        'quantity',
+        'item_description',
+        'message',
+        'status',
+        'created_at',
+        'fulfilled_at'
+      ]
     });
 
     res.status(200).json({
       success: true,
       count: donations.length,
-      data: donations
+      data: donations,
+      isOwner: isOwner
     });
   } catch (error) {
     next(error);
@@ -173,6 +201,55 @@ export const getDonationsByUser = async (req, res, next) => {
       success: true,
       count: donations.length,
       data: donations
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const confirmDonationReceipt = async (req, res, next) => {
+  try {
+    const { donationId } = req.params;
+
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required'
+      });
+    }
+
+    const donation = await Donation.findByPk(donationId, {
+      include: [{
+        model: NeedPost,
+        as: 'post'
+      }]
+    });
+
+    if (!donation) {
+      return res.status(404).json({
+        success: false,
+        message: 'Donation not found'
+      });
+    }
+
+    // Verify the user is the post owner
+    if (donation.post.user_id !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only the post owner can confirm receipt'
+      });
+    }
+
+    // Update donation status to fulfilled
+    await donation.update({
+      status: 'fulfilled',
+      fulfilled_at: new Date()
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Donation receipt confirmed successfully',
+      data: donation
     });
   } catch (error) {
     next(error);

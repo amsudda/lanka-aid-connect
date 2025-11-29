@@ -4,6 +4,7 @@ import DonorProfile from './DonorProfile.js';
 import NeedPost from './NeedPost.js';
 import PostImage from './PostImage.js';
 import Donation from './Donation.js';
+import DonationImage from './DonationImage.js';
 import EmergencyCenter from './EmergencyCenter.js';
 import PostFlag from './PostFlag.js';
 import Notification from './Notification.js';
@@ -24,6 +25,9 @@ Donation.belongsTo(NeedPost, { foreignKey: 'post_id', as: 'post' });
 User.hasMany(Donation, { foreignKey: 'donor_id', as: 'donations' });
 Donation.belongsTo(User, { foreignKey: 'donor_id', as: 'donor' });
 
+Donation.hasMany(DonationImage, { foreignKey: 'donation_id', as: 'images' });
+DonationImage.belongsTo(Donation, { foreignKey: 'donation_id', as: 'donation' });
+
 NeedPost.hasMany(PostFlag, { foreignKey: 'post_id', as: 'flags' });
 PostFlag.belongsTo(NeedPost, { foreignKey: 'post_id', as: 'post' });
 
@@ -40,6 +44,7 @@ const db = {
   NeedPost,
   PostImage,
   Donation,
+  DonationImage,
   EmergencyCenter,
   PostFlag,
   Notification

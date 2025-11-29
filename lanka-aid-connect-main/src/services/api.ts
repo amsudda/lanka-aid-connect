@@ -412,6 +412,16 @@ export const donationsAPI = {
     });
     return handleResponse(response);
   },
+
+  // Confirm receipt of donation (for post owners)
+  async confirmReceipt(donationId: string): Promise<{ success: boolean; message: string; data: Donation }> {
+    const url = `${API_BASE_URL}/posts/donations/${donationId}/confirm`;
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: createHeaders(true),
+    });
+    return handleResponse(response);
+  },
 };
 
 // Emergency Centers API
