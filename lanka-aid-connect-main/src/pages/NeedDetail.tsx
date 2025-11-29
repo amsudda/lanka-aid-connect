@@ -11,7 +11,7 @@ import { postsAPI, donationsAPI, authAPI } from "@/services/api";
 import { NeedPost, Donation, CATEGORY_LABELS, CATEGORY_ICONS, NeedCategory } from "@/types/database";
 import {
   MapPin, Phone, MessageCircle, Clock, Flag, ChevronLeft,
-  Heart, User, Loader2, Play, Pause, Navigation, Camera, Image as ImageIcon, X
+  Heart, User, Loader2, Navigation, Camera, Image as ImageIcon, X
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
@@ -46,7 +46,6 @@ export default function NeedDetail() {
   const [proofImages, setProofImages] = useState<File[]>([]);
   const [proofPreviews, setProofPreviews] = useState<string[]>([]);
   const [user, setUser] = useState<any>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -366,35 +365,6 @@ export default function NeedDetail() {
           <h3 className="font-semibold text-foreground mb-2">Description</h3>
           <p className="text-muted-foreground leading-relaxed">{post.description}</p>
         </div>
-
-        {/* Voice Note */}
-        {post.voice_note_url && (
-          <div className="bg-card rounded-2xl p-4 border border-border/50">
-            <h3 className="font-semibold text-foreground mb-3">Voice Message</h3>
-            <button
-              onClick={() => setIsPlaying(!isPlaying)}
-              className="flex items-center gap-3 w-full"
-            >
-              <div className={cn(
-                "p-3 rounded-full transition-colors",
-                isPlaying ? "bg-primary text-primary-foreground" : "bg-muted"
-              )}>
-                {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-              </div>
-              <div className="flex-1 h-8 bg-muted rounded-full flex items-center px-3">
-                <div className="flex gap-0.5 items-center">
-                  {[...Array(30)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="w-1 bg-primary/50 rounded-full"
-                      style={{ height: `${Math.random() * 20 + 4}px` }}
-                    />
-                  ))}
-                </div>
-              </div>
-            </button>
-          </div>
-        )}
 
         {/* Donors */}
         {donations.length > 0 && (
