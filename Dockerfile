@@ -87,7 +87,7 @@ EXPOSE 80 5000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-  CMD curl -f http://localhost:5000/health && curl -f http://localhost:80 || exit 1
+  CMD curl -f http://localhost:5000/api/v1/health && curl -f http://localhost:80 || exit 1
 
 # Start supervisord to manage both services
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
