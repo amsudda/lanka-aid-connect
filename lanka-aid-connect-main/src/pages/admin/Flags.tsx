@@ -245,32 +245,30 @@ export default function AdminFlags() {
 
       {/* Action Confirmation Dialog */}
       <AlertDialog open={!!actionFlag} onOpenChange={() => setActionFlag(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-[90vw] sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {actionFlag?.action === 'approve' ? 'Approve Flag' : 'Dismiss Flag'}
+              {actionFlag?.action === 'approve' ? 'Approve Flag?' : 'Dismiss Flag?'}
             </AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogDescription className="text-sm">
               {actionFlag?.action === 'approve' ? (
                 <>
-                  Are you sure you want to approve this flag? This will mark the flag as resolved
-                  and change the post status to "flagged", effectively hiding it from public view.
+                  This will hide the post from public view and mark the flag as resolved.
                 </>
               ) : (
                 <>
-                  Are you sure you want to dismiss this flag? This will mark the flag as resolved
-                  without taking any action on the post.
+                  This will mark the flag as resolved without taking action on the post.
                 </>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <AlertDialogCancel className="m-0">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleResolveFlag}
-              className={actionFlag?.action === 'approve' ? 'bg-red-600 hover:bg-red-700' : ''}
+              className={actionFlag?.action === 'approve' ? 'bg-red-600 hover:bg-red-700 m-0' : 'm-0'}
             >
-              {actionFlag?.action === 'approve' ? 'Approve Flag' : 'Dismiss Flag'}
+              {actionFlag?.action === 'approve' ? 'Approve & Hide' : 'Dismiss Flag'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

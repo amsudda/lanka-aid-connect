@@ -278,30 +278,28 @@ export default function AdminUsers() {
 
       {/* Verification Confirmation Dialog */}
       <AlertDialog open={!!verifyAction} onOpenChange={() => setVerifyAction(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-[90vw] sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {verifyAction?.isVerified ? 'Verify User' : 'Remove Verification'}
+              {verifyAction?.isVerified ? 'Verify User?' : 'Remove Verification?'}
             </AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogDescription className="text-sm">
               {verifyAction?.isVerified ? (
                 <>
-                  Are you sure you want to verify <strong>{verifyAction?.userName}</strong>?
-                  This will mark the user as verified and may give them additional privileges.
+                  Verify <strong>{verifyAction?.userName}</strong> as a trusted user.
                 </>
               ) : (
                 <>
-                  Are you sure you want to remove verification from{' '}
-                  <strong>{verifyAction?.userName}</strong>? This will mark the user as unverified.
+                  Remove verification from <strong>{verifyAction?.userName}</strong>.
                 </>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <AlertDialogCancel className="m-0">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleVerifyUser}
-              className={verifyAction?.isVerified ? 'bg-green-600 hover:bg-green-700' : ''}
+              className={verifyAction?.isVerified ? 'bg-green-600 hover:bg-green-700 m-0' : 'm-0'}
             >
               {verifyAction?.isVerified ? 'Verify User' : 'Remove Verification'}
             </AlertDialogAction>

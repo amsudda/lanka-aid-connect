@@ -327,21 +327,20 @@ export default function AdminPosts() {
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!deletePostId} onOpenChange={() => setDeletePostId(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-[90vw] sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Post</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle>Delete Post?</AlertDialogTitle>
+            <AlertDialogDescription className="text-sm">
               Are you sure you want to delete this post? This action cannot be undone.
-              All associated donations and data will be preserved but the post will be removed.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <AlertDialogCancel className="m-0">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeletePost}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 m-0"
             >
-              Delete
+              Delete Post
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
