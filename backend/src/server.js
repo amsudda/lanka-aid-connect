@@ -47,7 +47,8 @@ if (process.env.NODE_ENV === 'development') {
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+// Serve uploaded files from absolute path
+app.use('/uploads', express.static('/app/backend/uploads'));
 
 app.use(
   session({

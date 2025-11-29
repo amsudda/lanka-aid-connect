@@ -4,7 +4,8 @@ import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 
 // Save uploads to backend uploads directory (served by Express static middleware)
-const uploadDir = process.env.UPLOAD_PATH || './uploads';
+// Use absolute path to ensure consistency across all contexts
+const uploadDir = process.env.UPLOAD_PATH || '/app/backend/uploads';
 
 // Create single upload directory with detailed logging
 console.log('📁 Upload directory configuration:');
