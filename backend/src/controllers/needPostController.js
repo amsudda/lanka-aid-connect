@@ -317,7 +317,15 @@ export const deleteNeedPost = async (req, res, next) => {
       });
     }
 
-    if (post.edit_pin !== pin && (!req.user || req.user.role !== 'admin')) {
+    // Allow deletion if:
+    // 1. User is admin, OR
+    // 2. User is the post creator (authenticated), OR
+    // 3. Correct PIN is provided
+    const isAdmin = req.user && req.user.role === 'admin';
+    const isCreator = req.user && post.user_id === req.user.id;
+    const hasValidPin = post.edit_pin === pin;
+
+    if (!isAdmin && !isCreator && !hasValidPin) {
       return res.status(403).json({
         success: false,
         message: 'Invalid PIN or insufficient permissions'
