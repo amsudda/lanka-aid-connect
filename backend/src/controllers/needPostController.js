@@ -181,11 +181,27 @@ export const createNeedPost = async (req, res, next) => {
 
     // Handle image uploads (filter out voice note from files array)
     if (req.files && req.files.length > 0) {
+      console.log('📷 Processing image uploads...');
+      console.log('📷 Total files received:', req.files.length);
+
       const imageFiles = Array.isArray(req.files)
         ? req.files.filter(f => f.fieldname === 'images')
         : req.files['images'] || [];
 
+      console.log('📷 Image files found:', imageFiles.length);
+
       if (imageFiles.length > 0) {
+        imageFiles.forEach((file, idx) => {
+          console.log(`📷 Image ${idx + 1}:`, {
+            fieldname: file.fieldname,
+            filename: file.filename,
+            size: file.size,
+            mimetype: file.mimetype,
+            path: file.path,
+            url: `/uploads/posts/${file.filename}`
+          });
+        });
+
         const imagePromises = imageFiles.map((file, index) => {
           return PostImage.create({
             post_id: post.id,
@@ -194,8 +210,13 @@ export const createNeedPost = async (req, res, next) => {
           });
         });
 
-        await Promise.all(imagePromises);
+        const createdImages = await Promise.all(imagePromises);
+        console.log('📷 Successfully created', createdImages.length, 'image records in database');
+      } else {
+        console.log('📷 No image files to process');
       }
+    } else {
+      console.log('📷 No files uploaded');
     }
 
     const fullPost = await NeedPost.findByPk(post.id, {

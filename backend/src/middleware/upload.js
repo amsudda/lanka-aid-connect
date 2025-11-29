@@ -5,21 +5,43 @@ import fs from 'fs';
 
 const uploadDir = process.env.UPLOAD_PATH || './uploads';
 
+// Create upload directories with detailed logging
+console.log('📁 Upload directory configuration:');
+console.log('📁 Upload base path:', uploadDir);
+console.log('📁 Resolved upload path:', path.resolve(uploadDir));
+
 if (!fs.existsSync(uploadDir)) {
+  console.log('📁 Creating base upload directory...');
   fs.mkdirSync(uploadDir, { recursive: true });
+  console.log('✅ Base upload directory created');
 }
 
-if (!fs.existsSync(path.join(uploadDir, 'posts'))) {
-  fs.mkdirSync(path.join(uploadDir, 'posts'), { recursive: true });
+const postsDir = path.join(uploadDir, 'posts');
+const avatarsDir = path.join(uploadDir, 'avatars');
+const voiceNotesDir = path.join(uploadDir, 'voice-notes');
+
+if (!fs.existsSync(postsDir)) {
+  console.log('📁 Creating posts directory:', postsDir);
+  fs.mkdirSync(postsDir, { recursive: true });
+  console.log('✅ Posts directory created');
 }
 
-if (!fs.existsSync(path.join(uploadDir, 'avatars'))) {
-  fs.mkdirSync(path.join(uploadDir, 'avatars'), { recursive: true });
+if (!fs.existsSync(avatarsDir)) {
+  console.log('📁 Creating avatars directory:', avatarsDir);
+  fs.mkdirSync(avatarsDir, { recursive: true });
+  console.log('✅ Avatars directory created');
 }
 
-if (!fs.existsSync(path.join(uploadDir, 'voice-notes'))) {
-  fs.mkdirSync(path.join(uploadDir, 'voice-notes'), { recursive: true });
+if (!fs.existsSync(voiceNotesDir)) {
+  console.log('📁 Creating voice-notes directory:', voiceNotesDir);
+  fs.mkdirSync(voiceNotesDir, { recursive: true });
+  console.log('✅ Voice-notes directory created');
 }
+
+console.log('📁 Upload directories ready:');
+console.log('  - Posts:', fs.existsSync(postsDir) ? '✅' : '❌');
+console.log('  - Avatars:', fs.existsSync(avatarsDir) ? '✅' : '❌');
+console.log('  - Voice Notes:', fs.existsSync(voiceNotesDir) ? '✅' : '❌');
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -29,10 +51,13 @@ const storage = multer.diskStorage({
     } else if (file.fieldname === 'voice_note') {
       folder = 'voice-notes';
     }
-    cb(null, path.join(uploadDir, folder));
+    const destPath = path.join(uploadDir, folder);
+    console.log(`💾 Saving ${file.fieldname} to: ${destPath}`);
+    cb(null, destPath);
   },
   filename: function (req, file, cb) {
     const uniqueName = `${uuidv4()}${path.extname(file.originalname)}`;
+    console.log(`💾 Generated filename: ${uniqueName} for field: ${file.fieldname}`);
     cb(null, uniqueName);
   }
 });
