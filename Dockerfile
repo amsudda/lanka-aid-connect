@@ -15,6 +15,9 @@ RUN npm ci --legacy-peer-deps
 # Copy frontend source code
 COPY lanka-aid-connect-main/ ./
 
+# Set production API URL for Vite build
+ENV VITE_API_URL=https://lankaaid.idearigs.co.uk/api/v1
+
 # Build the frontend application
 RUN npm run build
 
