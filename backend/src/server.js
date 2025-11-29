@@ -27,7 +27,7 @@ app.use(cors({
     'https://localhost:8080',
     'http://192.168.1.5:8080',
     'https://192.168.1.5:8080',
-    process.env.FRONTEND_URL || 'http://localhost:5173'
+    (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/$/, '')
   ],
   credentials: true
 }));
