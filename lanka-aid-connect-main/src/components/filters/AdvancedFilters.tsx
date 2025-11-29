@@ -59,7 +59,10 @@ export function AdvancedFilters({
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="bottom" className="h-[85vh] rounded-t-3xl">
+      <SheetContent
+        side="bottom"
+        className="h-[85vh] sm:h-auto sm:max-h-[90vh] rounded-t-3xl sm:rounded-lg sm:max-w-2xl sm:left-[50%] sm:translate-x-[-50%] sm:bottom-auto sm:top-[50%] sm:translate-y-[-50%] sm:inset-x-auto"
+      >
         <SheetHeader className="pb-4 border-b border-border">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -73,13 +76,13 @@ export function AdvancedFilters({
                 </SheetDescription>
               </div>
             </div>
-            <Button variant="ghost" size="icon" onClick={onClose}>
+            <Button variant="ghost" size="icon" onClick={onClose} className="sm:hidden">
               <X className="w-5 h-5" />
             </Button>
           </div>
         </SheetHeader>
 
-        <div className="py-6 space-y-6 overflow-y-auto max-h-[calc(85vh-180px)]">
+        <div className="py-6 space-y-6 overflow-y-auto max-h-[calc(85vh-180px)] sm:max-h-[calc(90vh-200px)]">
           {/* District Filter */}
           <div className="space-y-3">
             <Label className="text-base font-semibold">Location</Label>
