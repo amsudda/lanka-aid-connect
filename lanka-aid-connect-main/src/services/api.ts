@@ -99,6 +99,7 @@ export interface DonorProfile {
 
 export interface CreatePostData {
   victim_name: string;
+  phone_number: string;
   title: string;
   description: string;
   category: string;
@@ -107,7 +108,6 @@ export interface CreatePostData {
   location_lat?: number;
   location_lng?: number;
   quantity_needed: number;
-  phone_number?: string;
   num_adults?: number;
   num_children?: number;
   num_infants?: number;
@@ -197,6 +197,7 @@ export const postsAPI = {
 
     // Append text fields
     formData.append('victim_name', data.victim_name);
+    formData.append('phone_number', data.phone_number);
     formData.append('title', data.title);
     formData.append('description', data.description);
     formData.append('category', data.category);
@@ -205,7 +206,6 @@ export const postsAPI = {
     if (data.location_lat) formData.append('location_lat', data.location_lat.toString());
     if (data.location_lng) formData.append('location_lng', data.location_lng.toString());
     formData.append('quantity_needed', data.quantity_needed.toString());
-    if (data.phone_number) formData.append('phone_number', data.phone_number);
 
     // Append family composition fields
     if (data.num_adults !== undefined) formData.append('num_adults', data.num_adults.toString());
