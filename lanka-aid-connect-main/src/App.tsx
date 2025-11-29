@@ -10,6 +10,7 @@ import Profile from "./pages/Profile";
 import NeedDetail from "./pages/NeedDetail";
 import MyPosts from "./pages/MyPosts";
 import SelectUserType from "./pages/SelectUserType";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -50,6 +51,7 @@ const App = () => {
             <Route path="/centers" element={<EmergencyCenters />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/need/:id" element={<NeedDetail />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />

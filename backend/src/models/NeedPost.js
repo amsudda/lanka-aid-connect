@@ -93,6 +93,35 @@ const NeedPost = sequelize.define('NeedPost', {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
     allowNull: false
+  },
+  // Family composition fields
+  num_adults: {
+    type: DataTypes.INTEGER,
+    defaultValue: 1,
+    allowNull: true
+  },
+  num_children: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    allowNull: true
+  },
+  num_infants: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    allowNull: true
+  },
+  infant_ages: {
+    type: DataTypes.JSON, // Store array of ages like [1, 3, 6] months
+    allowNull: true
+  },
+  is_group_request: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    allowNull: false
+  },
+  group_size: {
+    type: DataTypes.INTEGER,
+    allowNull: true
   }
 }, {
   tableName: 'need_posts',

@@ -117,7 +117,13 @@ export const createNeedPost = async (req, res, next) => {
       category,
       title,
       description,
-      quantity_needed
+      quantity_needed,
+      num_adults,
+      num_children,
+      num_infants,
+      infant_ages,
+      is_group_request,
+      group_size
     } = req.body;
 
     const edit_pin = Math.floor(1000 + Math.random() * 9000).toString();
@@ -152,7 +158,13 @@ export const createNeedPost = async (req, res, next) => {
       description,
       quantity_needed,
       voice_note_url,
-      edit_pin
+      edit_pin,
+      num_adults: num_adults ? parseInt(num_adults) : 1,
+      num_children: num_children ? parseInt(num_children) : 0,
+      num_infants: num_infants ? parseInt(num_infants) : 0,
+      infant_ages: infant_ages ? JSON.parse(infant_ages) : null,
+      is_group_request: is_group_request === 'true' || is_group_request === true,
+      group_size: group_size ? parseInt(group_size) : null
     });
 
     // Handle image uploads (filter out voice note from files array)

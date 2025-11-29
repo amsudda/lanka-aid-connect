@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { postsAPI } from "@/services/api";
 import { DISTRICTS, CATEGORY_LABELS, CATEGORY_ICONS, NeedCategory } from "@/types/database";
-import { Camera, MapPin, Phone, User, FileText, Package, Loader2, Navigation, Image, Mic } from "lucide-react";
+import { Camera, MapPin, Phone, User, FileText, Package, Loader2, Navigation, Image, Mic, Users, Baby } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { VoiceRecorder } from "@/components/ui/voice-recorder";
@@ -61,6 +61,12 @@ export default function PostNeed() {
     title: "",
     description: "",
     quantity_needed: 1,
+    num_adults: 1,
+    num_children: 0,
+    num_infants: 0,
+    infant_ages: [] as number[],
+    is_group_request: false,
+    group_size: undefined as number | undefined,
   });
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -183,6 +189,30 @@ export default function PostNeed() {
     }));
   };
 
+  const handleInfantCountChange = (count: number) => {
+    const newCount = Math.max(0, count);
+    setFormData(prev => {
+      const currentAges = prev.infant_ages;
+      const newAges = Array(newCount).fill(0).map((_, i) => currentAges[i] || 1);
+      return {
+        ...prev,
+        num_infants: newCount,
+        infant_ages: newAges
+      };
+    });
+  };
+
+  const handleInfantAgeChange = (index: number, age: number) => {
+    setFormData(prev => {
+      const newAges = [...prev.infant_ages];
+      newAges[index] = age;
+      return {
+        ...prev,
+        infant_ages: newAges
+      };
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -207,6 +237,12 @@ export default function PostNeed() {
         title: formData.title,
         description: formData.description,
         quantity_needed: formData.quantity_needed,
+        num_adults: formData.num_adults,
+        num_children: formData.num_children,
+        num_infants: formData.num_infants,
+        infant_ages: formData.infant_ages.length > 0 ? formData.infant_ages : undefined,
+        is_group_request: formData.is_group_request,
+        group_size: formData.group_size,
         images: images.length > 0 ? images : undefined,
         voiceNote: voiceNote || undefined,
       });
@@ -323,6 +359,118 @@ export default function PostNeed() {
               />
             </div>
             <p className="text-xs text-muted-foreground">This will be used for WhatsApp contact</p>
+          </div>
+        </div>
+
+        {/* Family Composition */}
+        <div className="space-y-4">
+          <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
+            <Users className="w-4 h-4" /> Family Composition
+          </h3>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="adults">Adults</Label>
+              <Input
+                id="adults"
+                type="number"
+                min={1}
+                value={formData.num_adults}
+                onChange={(e) => setFormData({ ...formData, num_adults: parseInt(e.target.value) || 1 })}
+                className="h-12 rounded-xl"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="children">Children</Label>
+              <Input
+                id="children"
+                type="number"
+                min={0}
+                value={formData.num_children}
+                onChange={(e) => setFormData({ ...formData, num_children: parseInt(e.target.value) || 0 })}
+                className="h-12 rounded-xl"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="infants">Infants</Label>
+              <Input
+                id="infants"
+                type="number"
+                min={0}
+                value={formData.num_infants}
+                onChange={(e) => handleInfantCountChange(parseInt(e.target.value) || 0)}
+                className="h-12 rounded-xl"
+              />
+            </div>
+          </div>
+
+          {formData.num_infants > 0 && (
+            <div className="space-y-3 bg-muted/30 p-4 rounded-xl border border-border">
+              <Label className="flex items-center gap-2 text-sm font-semibold">
+                <Baby className="w-4 h-4" />
+                Infant Ages (in months)
+              </Label>
+              <div className="grid grid-cols-2 gap-3">
+                {formData.infant_ages.map((age, index) => (
+                  <div key={index} className="space-y-1">
+                    <Label htmlFor={`infant-age-${index}`} className="text-xs text-muted-foreground">
+                      Infant {index + 1} Age
+                    </Label>
+                    <Select
+                      value={age.toString()}
+                      onValueChange={(value) => handleInfantAgeChange(index, parseInt(value))}
+                    >
+                      <SelectTrigger id={`infant-age-${index}`} className="h-10 rounded-lg">
+                        <SelectValue placeholder="Select age" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Array.from({ length: 36 }, (_, i) => i + 1).map((months) => (
+                          <SelectItem key={months} value={months.toString()}>
+                            {months} {months === 1 ? 'month' : 'months'}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 bg-muted/20 p-4 rounded-xl border border-border">
+              <input
+                type="checkbox"
+                id="group-request"
+                checked={formData.is_group_request}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  is_group_request: e.target.checked,
+                  group_size: e.target.checked ? formData.group_size : undefined
+                })}
+                className="w-5 h-5 rounded border-border text-primary focus:ring-primary"
+              />
+              <Label htmlFor="group-request" className="text-sm font-medium cursor-pointer flex-1">
+                This is a group request (asking help for multiple families)
+              </Label>
+            </div>
+
+            {formData.is_group_request && (
+              <div className="space-y-2 pl-8">
+                <Label htmlFor="group-size" className="text-sm">
+                  Number of families in the group
+                </Label>
+                <Input
+                  id="group-size"
+                  type="number"
+                  min={2}
+                  placeholder="e.g., 5"
+                  value={formData.group_size || ''}
+                  onChange={(e) => setFormData({ ...formData, group_size: parseInt(e.target.value) || undefined })}
+                  className="h-12 rounded-xl max-w-xs"
+                />
+              </div>
+            )}
           </div>
         </div>
 

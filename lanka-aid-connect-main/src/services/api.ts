@@ -108,6 +108,12 @@ export interface CreatePostData {
   location_lng?: number;
   quantity_needed: number;
   phone_number?: string;
+  num_adults?: number;
+  num_children?: number;
+  num_infants?: number;
+  infant_ages?: number[];
+  is_group_request?: boolean;
+  group_size?: number;
   images?: File[];
   voiceNote?: Blob;
 }
@@ -200,6 +206,14 @@ export const postsAPI = {
     if (data.location_lng) formData.append('location_lng', data.location_lng.toString());
     formData.append('quantity_needed', data.quantity_needed.toString());
     if (data.phone_number) formData.append('phone_number', data.phone_number);
+
+    // Append family composition fields
+    if (data.num_adults !== undefined) formData.append('num_adults', data.num_adults.toString());
+    if (data.num_children !== undefined) formData.append('num_children', data.num_children.toString());
+    if (data.num_infants !== undefined) formData.append('num_infants', data.num_infants.toString());
+    if (data.infant_ages && data.infant_ages.length > 0) formData.append('infant_ages', JSON.stringify(data.infant_ages));
+    if (data.is_group_request !== undefined) formData.append('is_group_request', data.is_group_request.toString());
+    if (data.group_size !== undefined) formData.append('group_size', data.group_size.toString());
 
     // Append images
     if (data.images && data.images.length > 0) {
