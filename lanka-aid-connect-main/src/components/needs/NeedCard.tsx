@@ -65,8 +65,8 @@ export function NeedCard({ post }: NeedCardProps) {
     if (!imageUrl) return "/placeholder.svg";
     // If it's already a full URL, return as is
     if (imageUrl.startsWith('http')) return imageUrl;
-    // Otherwise, prepend the backend URL
-    return `http://localhost:5000${imageUrl}`;
+    // Otherwise, use current domain (uploads are proxied through Nginx)
+    return `${window.location.origin}${imageUrl}`;
   };
   const displayImage = images[imageIndex] ? getImageUrl(images[imageIndex].image_url) : "/placeholder.svg";
 

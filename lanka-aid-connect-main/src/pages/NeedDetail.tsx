@@ -200,7 +200,7 @@ export default function NeedDetail() {
               images[activeImage]?.image_url
                 ? images[activeImage].image_url.startsWith('http')
                   ? images[activeImage].image_url
-                  : `http://localhost:5000${images[activeImage].image_url}`
+                  : `${window.location.origin}${images[activeImage].image_url}`
                 : "/placeholder.svg"
             }
             alt={post.title}
