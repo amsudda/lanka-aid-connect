@@ -215,10 +215,10 @@ export default function AdminPosts() {
                     <div className="space-y-4">
                       <p className="text-sm text-gray-700">{post.description}</p>
 
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                         <div>
                           <span className="text-gray-600">District:</span>
-                          <p className="font-medium">{post.district}</p>
+                          <p className="font-medium">{post.location_district}</p>
                         </div>
                         <div>
                           <span className="text-gray-600">Category:</span>
@@ -229,10 +229,6 @@ export default function AdminPosts() {
                           <p className="font-medium">
                             {post.quantity_donated || 0} / {post.quantity_needed}
                           </p>
-                        </div>
-                        <div>
-                          <span className="text-gray-600">Urgency:</span>
-                          <p className="font-medium">{post.urgency_level}</p>
                         </div>
                       </div>
 
