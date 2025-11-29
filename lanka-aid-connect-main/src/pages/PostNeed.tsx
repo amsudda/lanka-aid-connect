@@ -215,44 +215,55 @@ export default function PostNeed() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("🚀 POST CREATION STARTED");
+    console.log("📝 Form Data:", formData);
+    console.log("🖼️ Images:", images.length);
+    console.log("🎤 Voice Note:", !!voiceNote);
+    console.log("📂 Categories:", selectedCategories);
 
     // Validate required fields
     if (!formData.victim_name.trim()) {
+      console.log("❌ Validation failed: Name missing");
       toast.error("Please enter your name");
       return;
     }
 
     if (!formData.phone_number.trim()) {
+      console.log("❌ Validation failed: Phone number missing");
       toast.error("Please enter your phone number");
       return;
     }
 
     if (!formData.location_district) {
+      console.log("❌ Validation failed: District missing");
       toast.error("Please select your district");
       return;
     }
 
     if (selectedCategories.length === 0) {
+      console.log("❌ Validation failed: Category missing");
       toast.error("Please select at least one category");
       return;
     }
 
     if (!formData.title.trim()) {
+      console.log("❌ Validation failed: Title missing");
       toast.error("Please enter a title");
       return;
     }
 
     if (!formData.description.trim()) {
+      console.log("❌ Validation failed: Description missing");
       toast.error("Please enter a description");
       return;
     }
 
+    console.log("✅ All validations passed");
     setLoading(true);
 
     try {
-      // Create the post using the backend API
-      // Note: Since backend supports single category, we'll use the first selected category
-      const post = await postsAPI.create({
+      console.log("📡 Preparing API request...");
+      const postData = {
         victim_name: formData.victim_name,
         phone_number: formData.phone_number,
         location_district: formData.location_district,
@@ -271,14 +282,29 @@ export default function PostNeed() {
         group_size: formData.group_size,
         images: images.length > 0 ? images : undefined,
         voiceNote: voiceNote || undefined,
-      });
+      };
+
+      console.log("📤 Sending data to API:", postData);
+      console.log("⏱️ API call starting at:", new Date().toISOString());
+
+      const post = await postsAPI.create(postData);
+
+      console.log("✅ API call successful at:", new Date().toISOString());
+      console.log("📬 Response:", post);
 
       toast.success("Post created successfully!");
       navigate("/");
     } catch (error: any) {
-      console.error("Error creating post:", error);
-      toast.error(error.message || "Failed to create post");
+      console.error("❌ ERROR CREATING POST:");
+      console.error("Error type:", error.constructor.name);
+      console.error("Error message:", error.message);
+      console.error("Error status:", error.status);
+      console.error("Full error:", error);
+      console.error("Error stack:", error.stack);
+
+      toast.error(error.message || "Failed to create post. Check console for details.");
     } finally {
+      console.log("🏁 Post creation process ended");
       setLoading(false);
     }
   };

@@ -132,16 +132,31 @@ export class APIError extends Error {
 
 // Helper function to handle API responses
 async function handleResponse<T>(response: Response): Promise<T> {
+  console.log("🔍 API: Handling response, status:", response.status);
+
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: response.statusText }));
+    console.error("❌ API: Response not OK, status:", response.status);
+    const error = await response.json().catch((e) => {
+      console.error("❌ API: Failed to parse error JSON:", e);
+      return { message: response.statusText };
+    });
+    console.error("❌ API: Error details:", error);
+
     // Handle express-validator errors array
     if (error.errors && Array.isArray(error.errors)) {
       const errorMessages = error.errors.map((e: any) => e.msg).join(', ');
+      console.error("❌ API: Validation errors:", errorMessages);
       throw new APIError(response.status, errorMessages);
     }
+
+    console.error("❌ API: Throwing error:", error.message || 'An error occurred');
     throw new APIError(response.status, error.message || 'An error occurred');
   }
-  return response.json();
+
+  console.log("✅ API: Response OK, parsing JSON...");
+  const data = await response.json();
+  console.log("✅ API: JSON parsed:", data);
+  return data;
 }
 
 // Helper function to get auth token (if using JWT)
@@ -198,6 +213,7 @@ export const postsAPI = {
 
   // Create new post
   async create(data: CreatePostData): Promise<NeedPost> {
+    console.log("🔧 API: Building FormData...");
     const formData = new FormData();
 
     // Append text fields
@@ -222,6 +238,7 @@ export const postsAPI = {
 
     // Append images
     if (data.images && data.images.length > 0) {
+      console.log(`📎 API: Appending ${data.images.length} images`);
       data.images.forEach((image) => {
         formData.append('images', image);
       });
@@ -229,16 +246,29 @@ export const postsAPI = {
 
     // Append voice note
     if (data.voiceNote) {
+      console.log('🎤 API: Appending voice note');
       formData.append('voice_note', data.voiceNote, 'voice-note.webm');
     }
 
     const url = `${API_BASE_URL}${API_ENDPOINTS.POSTS}`;
+    console.log("🌐 API: Request URL:", url);
+    console.log("🔑 API: Auth token present:", !!getAuthToken());
+
+    console.log("📡 API: Sending POST request...");
+    const startTime = Date.now();
+
     const response = await fetch(url, {
       method: 'POST',
-      headers: createHeaders(true, true), // Changed to true to include auth token
+      headers: createHeaders(true, true),
       body: formData,
     });
+
+    const endTime = Date.now();
+    console.log(`⏱️ API: Request took ${endTime - startTime}ms`);
+    console.log("📥 API: Response status:", response.status, response.statusText);
+
     const result = await handleResponse<{ success: boolean; data: NeedPost; pin: string }>(response);
+    console.log("✅ API: Response parsed successfully");
     return result.data;
   },
 
