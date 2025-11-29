@@ -17,9 +17,18 @@ if (!fs.existsSync(path.join(uploadDir, 'avatars'))) {
   fs.mkdirSync(path.join(uploadDir, 'avatars'), { recursive: true });
 }
 
+if (!fs.existsSync(path.join(uploadDir, 'voice-notes'))) {
+  fs.mkdirSync(path.join(uploadDir, 'voice-notes'), { recursive: true });
+}
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const folder = req.path.includes('avatar') ? 'avatars' : 'posts';
+    let folder = 'posts';
+    if (req.path.includes('avatar')) {
+      folder = 'avatars';
+    } else if (file.fieldname === 'voice_note') {
+      folder = 'voice-notes';
+    }
     cb(null, path.join(uploadDir, folder));
   },
   filename: function (req, file, cb) {
@@ -29,9 +38,23 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|gif|webp/;
-  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = allowedTypes.test(file.mimetype);
+  // Check if this is a voice note
+  if (file.fieldname === 'voice_note') {
+    const allowedAudioTypes = /webm|mp4|mpeg|mp3|wav|ogg/;
+    const extname = allowedAudioTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = file.mimetype.startsWith('audio/') || file.mimetype === 'video/webm';
+
+    if (mimetype && (extname || file.mimetype === 'audio/webm' || file.mimetype === 'video/webm')) {
+      return cb(null, true);
+    } else {
+      return cb(new Error('Only audio files are allowed for voice notes'));
+    }
+  }
+
+  // Check if this is an image
+  const allowedImageTypes = /jpeg|jpg|png|gif|webp/;
+  const extname = allowedImageTypes.test(path.extname(file.originalname).toLowerCase());
+  const mimetype = allowedImageTypes.test(file.mimetype);
 
   if (mimetype && extname) {
     return cb(null, true);

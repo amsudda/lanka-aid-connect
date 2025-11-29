@@ -124,6 +124,18 @@ export const createNeedPost = async (req, res, next) => {
 
     const whatsapp_link = `https://wa.me/${phone_number.replace(/\D/g, '')}`;
 
+    // Check if there's a voice note upload
+    let voice_note_url = null;
+    if (req.files) {
+      const voiceNoteFile = Array.isArray(req.files)
+        ? req.files.find(f => f.fieldname === 'voice_note')
+        : req.files['voice_note'] ? req.files['voice_note'][0] : null;
+
+      if (voiceNoteFile) {
+        voice_note_url = `/uploads/voice-notes/${voiceNoteFile.filename}`;
+      }
+    }
+
     const post = await NeedPost.create({
       user_id: req.user?.id || null,
       victim_name,
@@ -139,19 +151,27 @@ export const createNeedPost = async (req, res, next) => {
       title,
       description,
       quantity_needed,
+      voice_note_url,
       edit_pin
     });
 
+    // Handle image uploads (filter out voice note from files array)
     if (req.files && req.files.length > 0) {
-      const imagePromises = req.files.map((file, index) => {
-        return PostImage.create({
-          post_id: post.id,
-          image_url: `/uploads/posts/${file.filename}`,
-          display_order: index
-        });
-      });
+      const imageFiles = Array.isArray(req.files)
+        ? req.files.filter(f => f.fieldname === 'images')
+        : req.files['images'] || [];
 
-      await Promise.all(imagePromises);
+      if (imageFiles.length > 0) {
+        const imagePromises = imageFiles.map((file, index) => {
+          return PostImage.create({
+            post_id: post.id,
+            image_url: `/uploads/posts/${file.filename}`,
+            display_order: index
+          });
+        });
+
+        await Promise.all(imagePromises);
+      }
     }
 
     const fullPost = await NeedPost.findByPk(post.id, {

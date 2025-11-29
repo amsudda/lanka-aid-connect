@@ -8,9 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { postsAPI } from "@/services/api";
 import { DISTRICTS, CATEGORY_LABELS, CATEGORY_ICONS, NeedCategory } from "@/types/database";
-import { Camera, MapPin, Phone, User, FileText, Package, Loader2, Navigation, Image } from "lucide-react";
+import { Camera, MapPin, Phone, User, FileText, Package, Loader2, Navigation, Image, Mic } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { VoiceRecorder } from "@/components/ui/voice-recorder";
+import { LocationPicker } from "@/components/ui/location-picker";
 
 const categories: NeedCategory[] = ['food', 'dry_rations', 'baby_items', 'medical', 'clothes', 'other'];
 
@@ -21,6 +23,7 @@ export default function PostNeed() {
   const [images, setImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<NeedCategory[]>([]);
+  const [voiceNote, setVoiceNote] = useState<Blob | null>(null);
 
   useEffect(() => {
     // Check if there's a token in the URL (from Google OAuth callback)
@@ -164,6 +167,22 @@ export default function PostNeed() {
     );
   };
 
+  const handleVoiceRecordingComplete = (blob: Blob) => {
+    setVoiceNote(blob);
+  };
+
+  const handleVoiceRecordingDelete = () => {
+    setVoiceNote(null);
+  };
+
+  const handleLocationSelect = (lat: number, lng: number) => {
+    setFormData(prev => ({
+      ...prev,
+      location_lat: parseFloat(lat.toFixed(7)),
+      location_lng: parseFloat(lng.toFixed(7)),
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -189,6 +208,7 @@ export default function PostNeed() {
         description: formData.description,
         quantity_needed: formData.quantity_needed,
         images: images.length > 0 ? images : undefined,
+        voiceNote: voiceNote || undefined,
       });
 
       toast.success("Post created successfully!");
@@ -204,6 +224,24 @@ export default function PostNeed() {
   return (
     <PageLayout title="Post a Need">
       <form onSubmit={handleSubmit} className="px-4 py-6 space-y-6">
+        {/* Voice Note */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Label className="text-base font-semibold flex items-center gap-2">
+              <Mic className="w-4 h-4" />
+              Voice Message (Optional)
+            </Label>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Record a voice message to explain your situation (max 2 minutes)
+          </p>
+          <VoiceRecorder
+            onRecordingComplete={handleVoiceRecordingComplete}
+            onRecordingDelete={handleVoiceRecordingDelete}
+            maxDuration={120}
+          />
+        </div>
+
         {/* Image Upload */}
         <div className="space-y-3">
           <Label className="text-base font-semibold">Photos (up to 5)</Label>
@@ -348,11 +386,17 @@ export default function PostNeed() {
             </div>
           </div>
 
+          <LocationPicker
+            onLocationSelect={handleLocationSelect}
+            initialLat={formData.location_lat}
+            initialLng={formData.location_lng}
+          />
+
           {formData.location_lat && formData.location_lng && (
-            <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-xl">
-              <p className="flex items-center gap-1">
-                <Navigation className="w-3 h-3" />
-                GPS Coordinates captured: {formData.location_lat.toFixed(6)}, {formData.location_lng.toFixed(6)}
+            <div className="text-xs text-muted-foreground bg-success/10 border border-success/20 p-3 rounded-xl">
+              <p className="flex items-center gap-1 text-success font-medium">
+                <MapPin className="w-3 h-3" />
+                Location set: {formData.location_lat.toFixed(6)}, {formData.location_lng.toFixed(6)}
               </p>
             </div>
           )}

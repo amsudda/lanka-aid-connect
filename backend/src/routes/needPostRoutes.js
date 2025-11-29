@@ -18,7 +18,10 @@ router.get('/', getAllNeedPosts);
 router.get('/stats', getStats);
 router.get('/my-posts', protect, getUserPosts);
 router.get('/:id', uuidValidation, getNeedPost);
-router.post('/', optional, upload.array('images', 5), needPostValidation, createNeedPost);
+router.post('/', optional, upload.fields([
+  { name: 'images', maxCount: 5 },
+  { name: 'voice_note', maxCount: 1 }
+]), needPostValidation, createNeedPost);
 router.put('/:id', uuidValidation, optional, updateNeedPost);
 router.delete('/:id', uuidValidation, optional, deleteNeedPost);
 

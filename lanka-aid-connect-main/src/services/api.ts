@@ -83,6 +83,7 @@ export interface CreatePostData {
   quantity_needed: number;
   phone_number?: string;
   images?: File[];
+  voiceNote?: Blob;
 }
 
 export interface CreateDonationData {
@@ -179,6 +180,11 @@ export const postsAPI = {
       data.images.forEach((image) => {
         formData.append('images', image);
       });
+    }
+
+    // Append voice note
+    if (data.voiceNote) {
+      formData.append('voice_note', data.voiceNote, 'voice-note.webm');
     }
 
     const url = `${API_BASE_URL}${API_ENDPOINTS.POSTS}`;
