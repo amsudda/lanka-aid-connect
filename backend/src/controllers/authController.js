@@ -35,8 +35,8 @@ export const googleCallback = async (req, res, next) => {
       await req.user.update({ last_login: new Date() });
     }
 
-    // Use frontend URL from environment variable
-    const redirectUrl = process.env.FRONTEND_URL || 'https://localhost:8080';
+    // Use frontend URL from environment variable and remove trailing slash
+    const redirectUrl = (process.env.FRONTEND_URL || 'https://localhost:8080').replace(/\/$/, '');
 
     // Determine redirect path based on user type
     const finalUserType = req.user.user_type || userType;

@@ -38,7 +38,7 @@ router.get(
     next();
   },
   passport.authenticate('google', {
-    failureRedirect: `${process.env.FRONTEND_URL || 'https://localhost:8080'}/select-type`,
+    failureRedirect: `${(process.env.FRONTEND_URL || 'https://localhost:8080').replace(/\/$/, '')}/select-type`,
     session: true
   }),
   googleCallback
