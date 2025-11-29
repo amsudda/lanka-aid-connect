@@ -53,8 +53,8 @@ COPY --from=backend-builder /app/backend /app/backend
 # Copy frontend build from frontend-builder
 COPY --from=frontend-builder /app/frontend/dist /usr/share/nginx/html
 
-# Create uploads directory in static files location
-RUN mkdir -p /usr/share/nginx/html/uploads && chmod 777 /usr/share/nginx/html/uploads
+# Create uploads directory in backend location for persistent storage
+RUN mkdir -p /app/backend/uploads && chmod 777 /app/backend/uploads
 
 # Copy nginx configuration
 COPY lanka-aid-connect-main/nginx.conf /etc/nginx/http.d/default.conf

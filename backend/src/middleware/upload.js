@@ -3,8 +3,8 @@ import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 
-// Save uploads to frontend static directory so Nginx can serve them directly
-const uploadDir = process.env.UPLOAD_PATH || '/usr/share/nginx/html/uploads';
+// Save uploads to backend directory with persistent storage
+const uploadDir = process.env.UPLOAD_PATH || '/app/backend/uploads';
 
 // Create single upload directory with detailed logging
 console.log('📁 Upload directory configuration:');

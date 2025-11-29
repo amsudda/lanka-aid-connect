@@ -254,18 +254,23 @@ export const postsAPI = {
     console.log("🌐 API: Request URL:", url);
     console.log("🔑 API: Auth token present:", !!getAuthToken());
 
+    const headers = createHeaders(true, true);
+    console.log("📋 API: Headers:", headers);
+
     console.log("📡 API: Sending POST request...");
     const startTime = Date.now();
 
     const response = await fetch(url, {
       method: 'POST',
-      headers: createHeaders(true, true),
+      headers: headers,
       body: formData,
     });
 
     const endTime = Date.now();
     console.log(`⏱️ API: Request took ${endTime - startTime}ms`);
     console.log("📥 API: Response status:", response.status, response.statusText);
+    console.log("📥 API: Response URL:", response.url);
+    console.log("📥 API: Was redirected:", response.redirected);
 
     const result = await handleResponse<{ success: boolean; data: NeedPost; pin: string }>(response);
     console.log("✅ API: Response parsed successfully");
