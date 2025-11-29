@@ -10,7 +10,7 @@ WORKDIR /app/frontend
 COPY lanka-aid-connect-main/package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # Copy frontend source code
 COPY lanka-aid-connect-main/ ./
@@ -27,7 +27,7 @@ WORKDIR /app/backend
 COPY backend/package*.json ./
 
 # Install production dependencies
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # Copy backend source code
 COPY backend/ ./
