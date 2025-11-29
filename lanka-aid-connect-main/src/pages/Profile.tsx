@@ -902,7 +902,7 @@ export default function Profile() {
 
         {/* Delete Confirmation Dialog */}
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-          <AlertDialogContent className="max-w-[calc(100vw-2rem)] w-full sm:max-w-lg mx-4">
+          <AlertDialogContent className="w-[calc(100vw-2rem)] max-w-lg">
             <AlertDialogHeader>
               <AlertDialogTitle>Delete Post</AlertDialogTitle>
               <AlertDialogDescription>
