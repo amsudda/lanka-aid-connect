@@ -38,6 +38,13 @@ export const API_ENDPOINTS = {
   SAVE_POST: (id: string) => `/posts/${id}/save`,
   UNSAVE_POST: (id: string) => `/posts/${id}/unsave`,
 
+  // Notifications
+  NOTIFICATIONS: '/notifications',
+  NOTIFICATIONS_UNREAD_COUNT: '/notifications/unread-count',
+  NOTIFICATION_MARK_READ: (id: string) => `/notifications/${id}/read`,
+  NOTIFICATIONS_MARK_ALL_READ: '/notifications/read-all',
+  NOTIFICATION_DELETE: (id: string) => `/notifications/${id}`,
+
   // Health
   HEALTH: '/health'
 };

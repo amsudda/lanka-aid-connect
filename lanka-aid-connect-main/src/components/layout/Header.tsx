@@ -1,6 +1,7 @@
-import { Heart, Search, Bell } from "lucide-react";
+import { Heart, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 interface HeaderProps {
   title?: string;
@@ -27,10 +28,7 @@ export function Header({ title, showSearch = true }: HeaderProps) {
               <Search className="w-5 h-5" />
             </Button>
           )}
-          <Button variant="ghost" size="icon-sm" className="rounded-full relative">
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-accent rounded-full" />
-          </Button>
+          <NotificationBell />
         </div>
       </div>
     </header>

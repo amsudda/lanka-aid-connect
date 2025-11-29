@@ -44,6 +44,31 @@ export interface Donation {
   };
 }
 
+export interface Notification {
+  id: string;
+  user_id: string;
+  type: 'donation_received' | 'post_fulfilled' | 'post_updated' | 'new_comment' | 'milestone_reached';
+  title: string;
+  message: string;
+  link?: string;
+  related_post_id?: string;
+  related_donation_id?: string;
+  is_read: boolean;
+  metadata?: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+  relatedPost?: {
+    id: string;
+    title: string;
+    category: string;
+  };
+  relatedDonation?: {
+    id: string;
+    donor_name: string;
+    quantity: number;
+  };
+}
+
 export interface EmergencyCenter {
   id: string;
   name: string;
@@ -424,6 +449,68 @@ export const authAPI = {
       body: JSON.stringify(data),
     });
     return handleResponse(response);
+  },
+};
+
+// Notifications API
+export const notificationsAPI = {
+  // Get all notifications
+  async getAll(unreadOnly: boolean = false, limit: number = 20, offset: number = 0): Promise<{
+    notifications: Notification[];
+    count: number;
+    unreadCount: number;
+  }> {
+    const url = `${API_BASE_URL}${API_ENDPOINTS.NOTIFICATIONS}?unread_only=${unreadOnly}&limit=${limit}&offset=${offset}`;
+    const response = await fetch(url, {
+      headers: createHeaders(true),
+    });
+    const result = await handleResponse<{ success: boolean; data: Notification[]; count: number; unreadCount: number }>(response);
+    return {
+      notifications: result.data,
+      count: result.count,
+      unreadCount: result.unreadCount
+    };
+  },
+
+  // Get unread count
+  async getUnreadCount(): Promise<number> {
+    const url = `${API_BASE_URL}${API_ENDPOINTS.NOTIFICATIONS_UNREAD_COUNT}`;
+    const response = await fetch(url, {
+      headers: createHeaders(true),
+    });
+    const result = await handleResponse<{ success: boolean; count: number }>(response);
+    return result.count;
+  },
+
+  // Mark as read
+  async markAsRead(id: string): Promise<Notification> {
+    const url = `${API_BASE_URL}${API_ENDPOINTS.NOTIFICATION_MARK_READ(id)}`;
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: createHeaders(true),
+    });
+    const result = await handleResponse<{ success: boolean; data: Notification }>(response);
+    return result.data;
+  },
+
+  // Mark all as read
+  async markAllAsRead(): Promise<void> {
+    const url = `${API_BASE_URL}${API_ENDPOINTS.NOTIFICATIONS_MARK_ALL_READ}`;
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: createHeaders(true),
+    });
+    await handleResponse(response);
+  },
+
+  // Delete notification
+  async delete(id: string): Promise<void> {
+    const url = `${API_BASE_URL}${API_ENDPOINTS.NOTIFICATION_DELETE(id)}`;
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: createHeaders(true),
+    });
+    await handleResponse(response);
   },
 };
 

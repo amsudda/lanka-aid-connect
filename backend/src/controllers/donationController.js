@@ -1,4 +1,5 @@
 import db from '../models/index.js';
+import { createNotification } from './notificationController.js';
 
 const { Donation, NeedPost, DonorProfile } = db;
 
@@ -36,10 +37,55 @@ export const createDonation = async (req, res, next) => {
       post.quantity_needed
     );
 
+    const wasFulfilled = post.status === 'fulfilled';
+    const newStatus = newQuantityDonated >= post.quantity_needed ? 'fulfilled' : 'active';
+
     await post.update({
       quantity_donated: newQuantityDonated,
-      status: newQuantityDonated >= post.quantity_needed ? 'fulfilled' : 'active'
+      status: newStatus
     });
+
+    // Create notification for the post owner (requester)
+    if (post.user_id) {
+      try {
+        await createNotification({
+          user_id: post.user_id,
+          type: 'donation_received',
+          title: '🎉 New Donation Received!',
+          message: `${donor_name} donated ${quantity} ${quantity > 1 ? 'items' : 'item'} to your post "${post.title}"${message ? `: "${message}"` : ''}`,
+          link: `/need/${post.id}`,
+          related_post_id: post.id,
+          related_donation_id: donation.id,
+          metadata: {
+            donor_name,
+            quantity,
+            post_title: post.title
+          }
+        });
+      } catch (notifError) {
+        console.error('Failed to create donation notification:', notifError);
+      }
+    }
+
+    // Create notification if post just became fulfilled
+    if (!wasFulfilled && newStatus === 'fulfilled' && post.user_id) {
+      try {
+        await createNotification({
+          user_id: post.user_id,
+          type: 'post_fulfilled',
+          title: '✅ Your Request is Fulfilled!',
+          message: `Great news! Your post "${post.title}" has received all the items needed. Thank you to all donors!`,
+          link: `/need/${post.id}`,
+          related_post_id: post.id,
+          metadata: {
+            post_title: post.title,
+            total_quantity: post.quantity_needed
+          }
+        });
+      } catch (notifError) {
+        console.error('Failed to create fulfillment notification:', notifError);
+      }
+    }
 
     if (req.user) {
       const [profile] = await DonorProfile.findOrCreate({
