@@ -26,7 +26,38 @@ Database: 3306:3306 (internal only)
 
 ## Quick Start
 
-### Using Docker Compose (Recommended)
+### Using Docker (Single Container - Recommended for Production)
+
+```bash
+# Clone the repository
+git clone https://github.com/amsudda/lanka-aid-connect.git
+cd lanka-aid-connect
+
+# Build the Docker image
+docker build -t lanka-aid-connect .
+
+# Run with environment variables
+docker run -d \
+  -p 8080:80 \
+  -p 5001:5000 \
+  -e DB_HOST=your_db_host \
+  -e DB_NAME=LankaAid \
+  -e DB_USER=your_db_user \
+  -e DB_PASSWORD=your_db_password \
+  -e JWT_SECRET=your_jwt_secret \
+  -e GOOGLE_CLIENT_ID=your_google_client_id \
+  -e GOOGLE_CLIENT_SECRET=your_google_secret \
+  -e GOOGLE_CALLBACK_URL=https://yourdomain.com/api/v1/auth/google/callback \
+  -e FRONTEND_URL=https://yourdomain.com \
+  -e NODE_ENV=production \
+  lanka-aid-connect
+
+# Access the application
+# Frontend: http://localhost:8080
+# Backend API: http://localhost:5001/api/v1
+```
+
+### Using Docker Compose (Alternative - Local Development)
 
 ```bash
 # Clone the repository
@@ -83,11 +114,14 @@ See `.env.example` for all required environment variables.
 ### Coolify/VPS Deployment
 
 1. **Base Directory:** `/` (root)
-2. **Build Pack:** `docker-compose`
-3. **Ports:** `8080,5001`
-4. **Port Mappings:** `8080:80,5001:5000`
-5. Set all environment variables in the platform
-6. Deploy!
+2. **Build Pack:** `Dockerfile`
+3. **Dockerfile Location:** `./Dockerfile`
+4. **Ports Exposes:** `8080,5001`
+5. **Ports Mappings:** `8080:80,5001:5000`
+6. Set all environment variables in the platform
+7. Deploy!
+
+**Note:** The single Dockerfile builds and runs both frontend (Nginx on port 80) and backend (Node.js on port 5000) using supervisord as a process manager.
 
 ### Update Google OAuth Callback
 

@@ -1,0 +1,47 @@
+# Node modules
+**/node_modules
+**/npm-debug.log
+
+# Git
+.git
+.gitignore
+.claude
+
+# Environment files (handled by Coolify)
+**/.env
+**/.env.*
+!**/.env.example
+
+# Build artifacts
+**/dist
+**/build
+
+# Uploads (will be volume mounted)
+backend/uploads/*
+
+# Documentation
+*.md
+!README.md
+
+# Docker files
+docker-compose.yml
+**/Dockerfile
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+**/logs
+**/*.log
+
+# Testing
+**/coverage
+**/.nyc_output
