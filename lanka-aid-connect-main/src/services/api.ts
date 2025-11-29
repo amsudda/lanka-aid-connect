@@ -19,6 +19,7 @@ export interface NeedPost {
   flag_count: number;
   edit_pin: string;
   voice_note_url?: string;
+  is_verified: boolean;
   created_at: string;
   updated_at: string;
   images?: PostImage[];
@@ -317,6 +318,16 @@ export const postsAPI = {
     const saved = JSON.parse(localStorage.getItem('saved_posts') || '[]');
     return saved.includes(postId);
   },
+
+  // Delete a post
+  async deletePost(postId: string): Promise<{ success: boolean; message: string }> {
+    const url = `${API_BASE_URL}${API_ENDPOINTS.POSTS}/${postId}`;
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: createHeaders(true),
+    });
+    return handleResponse(response);
+  },
 };
 
 // Donations API
@@ -417,8 +428,12 @@ export const profilesAPI = {
 // Auth API
 export const authAPI = {
   // Google OAuth login
-  getGoogleAuthUrl(): string {
-    return `${API_BASE_URL}${API_ENDPOINTS.AUTH_GOOGLE}`;
+  getGoogleAuthUrl(userType?: string): string {
+    const baseUrl = `${API_BASE_URL}${API_ENDPOINTS.AUTH_GOOGLE}`;
+    if (userType) {
+      return `${baseUrl}?userType=${userType}`;
+    }
+    return baseUrl;
   },
 
   // Get current user

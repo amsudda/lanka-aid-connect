@@ -19,7 +19,8 @@
       "Bash(git init:*)",
       "Bash(git add:*)",
       "Bash(git commit -m \"$(cat <<''EOF''\nImprove authentication flow, redesign UI, and add emergency features\n\n- Fix OAuth flow to use state parameter instead of session for user type persistence\n- Redesign profile pages with new card-based layouts for donors and requesters\n- Add emergency contacts carousel with auto-slide functionality on home page\n- Implement live statistics display (active requests, items donated, families helped)\n- Fix authentication token inclusion in post creation API calls\n- Add redirect check to prevent authenticated users from re-selecting user type\n- Add debug logging for post creation endpoint\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git push)"
+      "Bash(git push)",
+      "Bash(timeout /t 5)"
     ],
     "deny": [],
     "ask": []

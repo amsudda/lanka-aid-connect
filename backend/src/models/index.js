@@ -12,6 +12,9 @@ import Notification from './Notification.js';
 User.hasOne(DonorProfile, { foreignKey: 'user_id', as: 'profile' });
 DonorProfile.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
+User.hasMany(NeedPost, { foreignKey: 'user_id', as: 'posts' });
+NeedPost.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
 NeedPost.hasMany(PostImage, { foreignKey: 'post_id', as: 'images' });
 PostImage.belongsTo(NeedPost, { foreignKey: 'post_id', as: 'post' });
 

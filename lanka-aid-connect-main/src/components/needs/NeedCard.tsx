@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MapPin, MessageCircle, Clock, Flag, ChevronRight, Bookmark } from "lucide-react";
+import { MapPin, MessageCircle, Clock, Flag, ChevronRight, Bookmark, BadgeCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { NeedPost as APIPost, postsAPI } from "@/services/api";
@@ -132,9 +132,14 @@ export function NeedCard({ post }: NeedCardProps) {
       <div className="p-4 space-y-3">
         {/* Title and name */}
         <div>
-          <h3 className="font-semibold text-foreground text-lg leading-tight">
-            {post.title}
-          </h3>
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold text-foreground text-lg leading-tight">
+              {post.title}
+            </h3>
+            {post.is_verified && (
+              <BadgeCheck className="w-5 h-5 text-blue-500 flex-shrink-0" fill="currentColor" />
+            )}
+          </div>
           <p className="text-sm text-muted-foreground mt-1">
             Posted by {post.victim_name}
           </p>

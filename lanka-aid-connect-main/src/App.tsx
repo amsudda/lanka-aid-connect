@@ -11,6 +11,11 @@ import NeedDetail from "./pages/NeedDetail";
 import MyPosts from "./pages/MyPosts";
 import SelectUserType from "./pages/SelectUserType";
 import NotFound from "./pages/NotFound";
+import AdminLogin from "./pages/admin/Login";
+import AdminDashboard from "./pages/admin/Dashboard";
+import AdminPosts from "./pages/admin/Posts";
+import AdminFlags from "./pages/admin/Flags";
+import AdminUsers from "./pages/admin/Users";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +50,14 @@ const App = () => {
             <Route path="/centers" element={<EmergencyCenters />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/need/:id" element={<NeedDetail />} />
+
+            {/* Admin Routes */}
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/posts" element={<AdminPosts />} />
+            <Route path="/admin/flags" element={<AdminFlags />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

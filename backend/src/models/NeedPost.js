@@ -88,6 +88,11 @@ const NeedPost = sequelize.define('NeedPost', {
   voice_note_url: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+  is_verified: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    allowNull: false
   }
 }, {
   tableName: 'need_posts',

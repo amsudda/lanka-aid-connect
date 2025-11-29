@@ -12,8 +12,15 @@ export function NotificationBell() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  // Check authentication status
+  useEffect(() => {
+    const token = localStorage.getItem('auth_token');
+    setIsAuthenticated(!!token);
+  }, []);
 
   // Fetch notifications
   const fetchNotifications = async () => {
@@ -24,7 +31,12 @@ export function NotificationBell() {
       const { notifications: notifs, unreadCount: count } = await notificationsAPI.getAll(false, 10);
       setNotifications(notifs);
       setUnreadCount(count);
-    } catch (error) {
+    } catch (error: any) {
+      // Silently fail on 401 errors (user not authenticated)
+      if (error?.message?.includes('401') || error?.message?.includes('Unauthorized') || error?.message?.includes('User not found')) {
+        setIsAuthenticated(false);
+        return;
+      }
       console.error('Failed to fetch notifications:', error);
     }
   };
@@ -37,17 +49,24 @@ export function NotificationBell() {
 
       const count = await notificationsAPI.getUnreadCount();
       setUnreadCount(count);
-    } catch (error) {
+    } catch (error: any) {
+      // Silently fail on 401 errors (user not authenticated)
+      if (error?.message?.includes('401') || error?.message?.includes('Unauthorized') || error?.message?.includes('User not found')) {
+        setIsAuthenticated(false);
+        return;
+      }
       console.error('Failed to fetch unread count:', error);
     }
   };
 
   // Poll for new notifications every 30 seconds
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     fetchNotifications();
     const interval = setInterval(fetchUnreadCount, 30000); // 30 seconds
     return () => clearInterval(interval);
-  }, []);
+  }, [isAuthenticated]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -132,6 +151,11 @@ export function NotificationBell() {
         return '📬';
     }
   };
+
+  // Don't render if not authenticated
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="relative" ref={dropdownRef}>

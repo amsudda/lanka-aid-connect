@@ -20,9 +20,18 @@ const PostFlag = sequelize.define('PostFlag', {
     type: DataTypes.TEXT,
     allowNull: true
   },
+  details: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
   reporter_ip: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+  is_resolved: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    allowNull: false
   }
 }, {
   tableName: 'post_flags',

@@ -3,6 +3,16 @@ import { PageLayout } from "@/components/layout/PageLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { authAPI, donationsAPI, postsAPI } from "@/services/api";
 import { NeedPost, Donation } from "@/types/database";
 import {
@@ -39,6 +49,9 @@ export default function Profile() {
   const [selectedPost, setSelectedPost] = useState<NeedPost | null>(null);
   const [postDialogOpen, setPostDialogOpen] = useState(false);
   const [postDonations, setPostDonations] = useState<Donation[]>([]);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [postToDelete, setPostToDelete] = useState<NeedPost | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     // Check if there's a token in the URL (from Google OAuth callback)
@@ -129,7 +142,9 @@ export default function Profile() {
   };
 
   const handleGoogleSignIn = () => {
-    const googleAuthUrl = authAPI.getGoogleAuthUrl();
+    // Default to donor if no type selected
+    const selectedUserType = localStorage.getItem('selected_user_type') || 'donor';
+    const googleAuthUrl = authAPI.getGoogleAuthUrl(selectedUserType);
     window.location.href = googleAuthUrl;
   };
 
@@ -169,6 +184,32 @@ export default function Profile() {
     } catch (error) {
       console.error("Error fetching donations:", error);
       setPostDonations([]);
+    }
+  };
+
+  const handleDeleteClick = (post: NeedPost) => {
+    setPostToDelete(post);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!postToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      await postsAPI.deletePost(postToDelete.id);
+      toast.success("Post deleted successfully");
+
+      // Remove post from the list
+      setMyPosts(prevPosts => prevPosts.filter(p => p.id !== postToDelete.id));
+
+      setDeleteDialogOpen(false);
+      setPostToDelete(null);
+    } catch (error: any) {
+      console.error("Error deleting post:", error);
+      toast.error(error.message || "Failed to delete post");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -499,8 +540,7 @@ export default function Profile() {
                           className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
                           onClick={(e) => {
                             e.stopPropagation();
-                            // Handle delete
-                            toast.error("Delete functionality coming soon");
+                            handleDeleteClick(post);
                           }}
                         >
                           <Trash2 className="w-4 h-4" />
@@ -859,6 +899,31 @@ export default function Profile() {
             )}
           </DialogContent>
         </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <AlertDialogContent className="max-w-[calc(100vw-2rem)] w-full sm:max-w-lg mx-4">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Post</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete "{postToDelete?.title}"? This action cannot be undone.
+                All associated data including donations will be removed.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+              <AlertDialogCancel disabled={isDeleting} className="w-full sm:w-auto">
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteConfirm}
+                disabled={isDeleting}
+                className="bg-destructive hover:bg-destructive/90 w-full sm:w-auto"
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </PageLayout>
   );
