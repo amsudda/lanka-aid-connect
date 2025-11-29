@@ -61,9 +61,9 @@ const Notification = sequelize.define('Notification', {
     defaultValue: false
   },
   metadata: {
-    type: DataTypes.JSONB,
+    type: DataTypes.JSON,
     allowNull: true,
-    defaultValue: {}
+    defaultValue: null
   }
 }, {
   tableName: 'notifications',
