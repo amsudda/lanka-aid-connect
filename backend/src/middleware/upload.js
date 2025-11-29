@@ -5,55 +5,24 @@ import fs from 'fs';
 
 const uploadDir = process.env.UPLOAD_PATH || './uploads';
 
-// Create upload directories with detailed logging
+// Create single upload directory with detailed logging
 console.log('📁 Upload directory configuration:');
 console.log('📁 Upload base path:', uploadDir);
 console.log('📁 Resolved upload path:', path.resolve(uploadDir));
 
 if (!fs.existsSync(uploadDir)) {
-  console.log('📁 Creating base upload directory...');
+  console.log('📁 Creating upload directory...');
   fs.mkdirSync(uploadDir, { recursive: true });
-  console.log('✅ Base upload directory created');
+  console.log('✅ Upload directory created');
 }
 
-const postsDir = path.join(uploadDir, 'posts');
-const avatarsDir = path.join(uploadDir, 'avatars');
-const voiceNotesDir = path.join(uploadDir, 'voice-notes');
-
-if (!fs.existsSync(postsDir)) {
-  console.log('📁 Creating posts directory:', postsDir);
-  fs.mkdirSync(postsDir, { recursive: true });
-  console.log('✅ Posts directory created');
-}
-
-if (!fs.existsSync(avatarsDir)) {
-  console.log('📁 Creating avatars directory:', avatarsDir);
-  fs.mkdirSync(avatarsDir, { recursive: true });
-  console.log('✅ Avatars directory created');
-}
-
-if (!fs.existsSync(voiceNotesDir)) {
-  console.log('📁 Creating voice-notes directory:', voiceNotesDir);
-  fs.mkdirSync(voiceNotesDir, { recursive: true });
-  console.log('✅ Voice-notes directory created');
-}
-
-console.log('📁 Upload directories ready:');
-console.log('  - Posts:', fs.existsSync(postsDir) ? '✅' : '❌');
-console.log('  - Avatars:', fs.existsSync(avatarsDir) ? '✅' : '❌');
-console.log('  - Voice Notes:', fs.existsSync(voiceNotesDir) ? '✅' : '❌');
+console.log('📁 Upload directory ready:', fs.existsSync(uploadDir) ? '✅' : '❌');
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    let folder = 'posts';
-    if (req.path.includes('avatar')) {
-      folder = 'avatars';
-    } else if (file.fieldname === 'voice_note') {
-      folder = 'voice-notes';
-    }
-    const destPath = path.join(uploadDir, folder);
-    console.log(`💾 Saving ${file.fieldname} to: ${destPath}`);
-    cb(null, destPath);
+    // Save all files to single uploads directory
+    console.log(`💾 Saving ${file.fieldname} to: ${uploadDir}`);
+    cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
     const uniqueName = `${uuidv4()}${path.extname(file.originalname)}`;

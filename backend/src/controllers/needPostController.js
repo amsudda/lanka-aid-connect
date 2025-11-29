@@ -150,7 +150,7 @@ export const createNeedPost = async (req, res, next) => {
         : req.files['voice_note'] ? req.files['voice_note'][0] : null;
 
       if (voiceNoteFile) {
-        voice_note_url = `/uploads/voice-notes/${voiceNoteFile.filename}`;
+        voice_note_url = `/uploads/${voiceNoteFile.filename}`;
       }
     }
 
@@ -198,14 +198,14 @@ export const createNeedPost = async (req, res, next) => {
             size: file.size,
             mimetype: file.mimetype,
             path: file.path,
-            url: `/uploads/posts/${file.filename}`
+            url: `/uploads/${file.filename}`
           });
         });
 
         const imagePromises = imageFiles.map((file, index) => {
           return PostImage.create({
             post_id: post.id,
-            image_url: `/uploads/posts/${file.filename}`,
+            image_url: `/uploads/${file.filename}`,
             display_order: index
           });
         });
