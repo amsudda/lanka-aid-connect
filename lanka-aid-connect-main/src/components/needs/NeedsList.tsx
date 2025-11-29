@@ -7,31 +7,76 @@ import { Skeleton } from "@/components/ui/skeleton";
 interface NeedsListProps {
   category: NeedCategory | "all";
   searchQuery?: string;
+  district?: string;
+  status?: 'all' | 'active' | 'fulfilled';
+  sortBy?: 'newest' | 'urgent' | 'progress';
 }
 
-export function NeedsList({ category, searchQuery }: NeedsListProps) {
+export function NeedsList({
+  category,
+  searchQuery,
+  district = 'all',
+  status = 'active',
+  sortBy = 'newest'
+}: NeedsListProps) {
   const [posts, setPosts] = useState<APIPost[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchPosts();
-  }, [category, searchQuery]);
+  }, [category, searchQuery, district, status, sortBy]);
 
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const params: any = { status: 'active' };
+      const params: any = {};
 
+      // Category filter
       if (category !== "all") {
         params.category = category;
       }
 
+      // District filter
+      if (district && district !== 'all') {
+        params.district = district;
+      }
+
+      // Status filter
+      if (status && status !== 'all') {
+        params.status = status;
+      }
+
+      // Search query
       if (searchQuery) {
         params.search = searchQuery;
       }
 
+      // Sort parameter
+      if (sortBy) {
+        params.sortBy = sortBy;
+      }
+
       const { posts: data } = await postsAPI.getAll(params);
-      setPosts(data);
+
+      // Client-side sorting if backend doesn't support it yet
+      let sortedPosts = [...data];
+      if (sortBy === 'urgent') {
+        // Sort by lowest progress percentage (most urgent)
+        sortedPosts.sort((a, b) => {
+          const progressA = (a.quantity_donated / a.quantity_needed) * 100;
+          const progressB = (b.quantity_donated / b.quantity_needed) * 100;
+          return progressA - progressB;
+        });
+      } else if (sortBy === 'progress') {
+        // Sort by highest progress percentage (nearly complete)
+        sortedPosts.sort((a, b) => {
+          const progressA = (a.quantity_donated / a.quantity_needed) * 100;
+          const progressB = (b.quantity_donated / b.quantity_needed) * 100;
+          return progressB - progressA;
+        });
+      }
+
+      setPosts(sortedPosts);
     } catch (error) {
       console.error("Error fetching posts:", error);
     } finally {

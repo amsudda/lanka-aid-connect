@@ -9,15 +9,23 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { postsAPI } from "@/services/api";
+import { AdvancedFilters, FilterOptions } from "@/components/filters/AdvancedFilters";
 
 const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState<NeedCategory | "all">("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [stats, setStats] = useState({ activeRequests: 0, itemsDonated: 0, familiesHelped: 0 });
+  const [filters, setFilters] = useState<FilterOptions>({
+    district: 'all',
+    status: 'all',
+    sortBy: 'newest',
+  });
 
   const emergencyCards = [
     {
@@ -236,8 +244,13 @@ const Index = () => {
             <Search className="w-5 h-5 mr-2" />
             Search Requests
           </Button>
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" className="relative" onClick={() => setShowFilters(true)}>
             <SlidersHorizontal className="w-5 h-5" />
+            {(filters.district !== 'all' || filters.status !== 'all' || filters.sortBy !== 'newest') && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
+                {[filters.district !== 'all', filters.status !== 'all', filters.sortBy !== 'newest'].filter(Boolean).length}
+              </span>
+            )}
           </Button>
         </div>
       </section>
@@ -259,6 +272,62 @@ const Index = () => {
 
       {/* Category Filter */}
       <CategoryFilter selected={selectedCategory} onSelect={setSelectedCategory} />
+
+      {/* Active Filters Chips */}
+      {(filters.district !== 'all' || filters.status !== 'all' || filters.sortBy !== 'newest' || searchQuery) && (
+        <div className="px-4 py-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs text-muted-foreground font-medium">Active:</span>
+            {searchQuery && (
+              <Badge variant="secondary" className="gap-1">
+                🔍 "{searchQuery}"
+                <X
+                  className="w-3 h-3 cursor-pointer hover:text-destructive"
+                  onClick={() => setSearchQuery("")}
+                />
+              </Badge>
+            )}
+            {filters.district !== 'all' && (
+              <Badge variant="secondary" className="gap-1">
+                📍 {filters.district}
+                <X
+                  className="w-3 h-3 cursor-pointer hover:text-destructive"
+                  onClick={() => setFilters({ ...filters, district: 'all' })}
+                />
+              </Badge>
+            )}
+            {filters.status !== 'all' && (
+              <Badge variant="secondary" className="gap-1">
+                {filters.status === 'active' ? '🔴' : '✅'} {filters.status}
+                <X
+                  className="w-3 h-3 cursor-pointer hover:text-destructive"
+                  onClick={() => setFilters({ ...filters, status: 'all' })}
+                />
+              </Badge>
+            )}
+            {filters.sortBy !== 'newest' && (
+              <Badge variant="secondary" className="gap-1">
+                {filters.sortBy === 'urgent' ? '⚡ Urgent' : '📈 Nearly Complete'}
+                <X
+                  className="w-3 h-3 cursor-pointer hover:text-destructive"
+                  onClick={() => setFilters({ ...filters, sortBy: 'newest' })}
+                />
+              </Badge>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 text-xs px-2"
+              onClick={() => {
+                setSearchQuery("");
+                setFilters({ district: 'all', status: 'all', sortBy: 'newest' });
+              }}
+            >
+              Clear all
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Stats Bar */}
       <div className="px-4 py-4">
@@ -287,7 +356,21 @@ const Index = () => {
       </div>
 
       {/* Needs List */}
-      <NeedsList category={selectedCategory} searchQuery={searchQuery} />
+      <NeedsList
+        category={selectedCategory}
+        searchQuery={searchQuery}
+        district={filters.district}
+        status={filters.status}
+        sortBy={filters.sortBy}
+      />
+
+      {/* Advanced Filters Sheet */}
+      <AdvancedFilters
+        isOpen={showFilters}
+        onClose={() => setShowFilters(false)}
+        filters={filters}
+        onApplyFilters={(newFilters) => setFilters(newFilters)}
+      />
     </PageLayout>
   );
 };
