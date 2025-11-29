@@ -105,6 +105,7 @@ const Index = () => {
     const fetchStats = async () => {
       try {
         const statsData = await postsAPI.getStats();
+        console.log('Stats data received:', statsData); // Debug log
         setStats({
           activeRequests: statsData.active || 0,
           itemsDonated: statsData.totalQuantityDonated || 0,

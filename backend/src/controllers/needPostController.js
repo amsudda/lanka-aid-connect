@@ -320,17 +320,28 @@ export const getUserPosts = async (req, res, next) => {
 
 export const getStats = async (req, res, next) => {
   try {
-    const activePosts = await NeedPost.count({ where: { status: 'active' } });
-    const totalDonations = await Donation.sum('quantity') || 0;
-    const familiesHelped = await NeedPost.count({ where: { status: 'fulfilled' } });
+    // Count total posts
+    const total = await NeedPost.count();
+
+    // Count active posts
+    const active = await NeedPost.count({ where: { status: 'active' } });
+
+    // Count fulfilled posts
+    const fulfilled = await NeedPost.count({ where: { status: 'fulfilled' } });
+
+    // Sum total quantity needed
+    const totalQuantityNeeded = await NeedPost.sum('quantity_needed') || 0;
+
+    // Sum total quantity donated
+    const totalQuantityDonated = await Donation.sum('quantity') || 0;
 
     res.status(200).json({
       success: true,
-      data: {
-        activePosts,
-        totalDonations,
-        familiesHelped
-      }
+      total,
+      active,
+      fulfilled,
+      totalQuantityNeeded,
+      totalQuantityDonated
     });
   } catch (error) {
     next(error);
