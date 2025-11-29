@@ -180,9 +180,10 @@ export const createNeedPost = async (req, res, next) => {
     });
 
     // Handle image uploads (filter out voice note from files array)
-    if (req.files && req.files.length > 0) {
-      console.log('📷 Processing image uploads...');
-      console.log('📷 Total files received:', req.files.length);
+    if (req.files) {
+      console.log('📷 Processing uploads...');
+      console.log('📷 req.files type:', Array.isArray(req.files) ? 'array' : 'object');
+      console.log('📷 req.files keys:', Object.keys(req.files));
 
       const imageFiles = Array.isArray(req.files)
         ? req.files.filter(f => f.fieldname === 'images')
