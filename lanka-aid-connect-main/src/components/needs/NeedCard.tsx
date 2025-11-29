@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MapPin, MessageCircle, Clock, Flag, ChevronRight, Bookmark, BadgeCheck } from "lucide-react";
+import { MapPin, MessageCircle, Clock, Flag, ChevronRight, Bookmark, BadgeCheck, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { NeedPost as APIPost, postsAPI } from "@/services/api";
@@ -171,6 +171,24 @@ export function NeedCard({ post }: NeedCardProps) {
         <p className="text-sm text-foreground/80 line-clamp-2">
           {post.description}
         </p>
+
+        {/* Voice Note */}
+        {post.voice_note_url && (
+          <div className="bg-primary/5 border border-primary/20 rounded-xl p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <Volume2 className="w-4 h-4 text-primary" />
+              <span className="text-xs font-medium text-primary">Voice Message</span>
+            </div>
+            <audio
+              controls
+              className="w-full h-8"
+              style={{ maxHeight: '32px' }}
+              src={`${window.location.origin}${post.voice_note_url}`}
+            >
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+        )}
 
         {/* Progress bar */}
         <div className="space-y-2">

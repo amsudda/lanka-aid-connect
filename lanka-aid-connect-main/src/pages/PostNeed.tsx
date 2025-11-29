@@ -640,7 +640,10 @@ export default function PostNeed() {
               type="number"
               min={1}
               value={formData.quantity_needed}
-              onChange={(e) => setFormData({ ...formData, quantity_needed: parseInt(e.target.value) || 1 })}
+              onChange={(e) => {
+                const value = e.target.value === '' ? 1 : parseInt(e.target.value);
+                setFormData({ ...formData, quantity_needed: value });
+              }}
               className="h-12 rounded-xl"
             />
           </div>
