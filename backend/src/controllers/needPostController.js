@@ -5,6 +5,11 @@ const { NeedPost, PostImage, Donation, User } = db;
 
 export const getAllNeedPosts = async (req, res, next) => {
   try {
+    console.log('\n========== GET ALL POSTS REQUEST ==========');
+    console.log('🟢 BACKEND: getAllNeedPosts controller invoked');
+    console.log('🟢 Method:', req.method);
+    console.log('🟢 URL:', req.originalUrl);
+
     const {
       category,
       district,
@@ -101,6 +106,13 @@ export const getNeedPost = async (req, res, next) => {
 
 export const createNeedPost = async (req, res, next) => {
   try {
+    console.log('\n========== CREATE POST REQUEST ==========');
+    console.log('🔴 BACKEND: createNeedPost controller invoked');
+    console.log('🔴 Method:', req.method);
+    console.log('🔴 URL:', req.originalUrl);
+    console.log('🔴 Headers:', JSON.stringify(req.headers, null, 2));
+    console.log('🔴 Body keys:', Object.keys(req.body));
+    console.log('🔴 Files:', req.files ? Object.keys(req.files) : 'none');
     console.log('📝 Create Post - User authenticated:', !!req.user);
     console.log('📝 Create Post - User ID:', req.user?.id);
     console.log('📝 Create Post - Auth header present:', !!req.headers.authorization);
@@ -196,12 +208,18 @@ export const createNeedPost = async (req, res, next) => {
       ]
     });
 
+    console.log('🔴 BACKEND: Post created successfully, ID:', post.id);
+    console.log('🔴 BACKEND: Sending response with data and pin');
+    console.log('========== CREATE POST REQUEST COMPLETE ==========\n');
+
     res.status(201).json({
       success: true,
       data: fullPost,
       pin: edit_pin
     });
   } catch (error) {
+    console.error('🔴 BACKEND: Error in createNeedPost:', error);
+    console.log('========== CREATE POST REQUEST FAILED ==========\n');
     next(error);
   }
 };
