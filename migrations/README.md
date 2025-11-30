@@ -5,7 +5,7 @@
 ### Option 1: Using MySQL Command Line
 
 ```bash
-mysql -h 31.97.116.89 -P 5444 -u mysql -p LankaAid < migrations/2025-11-29-donation-and-reporting-system.sql
+mysql -h 31.97.116.89 -P 5444 -u mysql -p LankaAid < migrations/2025-11-29-donation-tracking-system.sql
 ```
 
 When prompted, enter your database password: `rxKXgIImsj91XtDSH3oI6gOHDcMn534AcfcoIWIZ7K8ErCMGguwKB5k4XRjwM9lx`
@@ -20,7 +20,7 @@ When prompted, enter your database password: `rxKXgIImsj91XtDSH3oI6gOHDcMn534Acf
    - Password: `rxKXgIImsj91XtDSH3oI6gOHDcMn534AcfcoIWIZ7K8ErCMGguwKB5k4XRjwM9lx`
    - Database: `LankaAid`
 3. Open the SQL query window
-4. Copy and paste the entire content of `2025-11-29-donation-and-reporting-system.sql`
+4. Copy and paste the entire content of `2025-11-29-donation-tracking-system.sql`
 5. Execute the SQL
 
 ### Option 3: Copy-Paste Individual Queries
@@ -42,19 +42,12 @@ If you prefer to run queries one by one, copy each section from the migration fi
 - Supports multiple images per donation with display order
 - Cascading delete when donation is removed
 
-### Post Flags Table
-- Adds `reporter_id` column to track who reported (NULL for anonymous)
-- Updates `reason` enum to include: spam, scam, fake, harassment, inappropriate, other
-- Adds `status` enum for report lifecycle (pending, resolved, dismissed)
-- Adds foreign key to users table
-- Adds indexes for better query performance
-
 ## After Migration
 
 1. Verify the changes by running the verification queries at the bottom of the migration file
 2. Redeploy your application on Coolify
 3. The backend should start successfully
-4. Test the new features (donation tracking, post reporting)
+4. Test the new donation tracking features
 
 ## Rollback (If Needed)
 
@@ -71,16 +64,4 @@ ALTER TABLE donations
 
 -- Drop donation_images table
 DROP TABLE IF EXISTS donation_images;
-
--- Remove new columns from post_flags
-ALTER TABLE post_flags
-  DROP FOREIGN KEY fk_post_flags_reporter,
-  DROP INDEX idx_status,
-  DROP INDEX idx_reporter_id,
-  DROP COLUMN status,
-  DROP COLUMN reporter_id;
-
--- Restore old reason enum (if needed)
-ALTER TABLE post_flags
-  MODIFY COLUMN reason VARCHAR(255);
 ```

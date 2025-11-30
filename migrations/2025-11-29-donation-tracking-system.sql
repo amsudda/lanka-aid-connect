@@ -1,6 +1,6 @@
--- Migration: Add Donation Tracking and Post Reporting System
+-- Migration: Add Donation Tracking System
 -- Date: 2025-11-29
--- Description: Adds status tracking, images, and enhanced fields for donations and reports
+-- Description: Adds status tracking, images, and enhanced fields for donations
 
 -- ============================================
 -- 1. DONATIONS TABLE - Add new tracking fields
@@ -52,37 +52,6 @@ CREATE TABLE IF NOT EXISTS donation_images (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
--- 3. POST_FLAGS TABLE - Add reporting enhancements
--- ============================================
-
--- Add reporter_id column (nullable for anonymous reports)
-ALTER TABLE post_flags
-ADD COLUMN reporter_id CHAR(36) NULL AFTER post_id;
-
--- Update reason enum to include new categories
-ALTER TABLE post_flags
-MODIFY COLUMN reason ENUM('spam', 'scam', 'fake', 'harassment', 'inappropriate', 'other')
-NOT NULL DEFAULT 'other';
-
--- Add status enum column for tracking report lifecycle
-ALTER TABLE post_flags
-ADD COLUMN status ENUM('pending', 'resolved', 'dismissed')
-NOT NULL DEFAULT 'pending'
-AFTER details;
-
--- Add foreign key for reporter
-ALTER TABLE post_flags
-ADD CONSTRAINT fk_post_flags_reporter
-  FOREIGN KEY (reporter_id)
-  REFERENCES users(id)
-  ON DELETE SET NULL;
-
--- Add indexes for performance
-ALTER TABLE post_flags
-ADD INDEX idx_reporter_id (reporter_id),
-ADD INDEX idx_status (status);
-
--- ============================================
 -- VERIFICATION QUERIES (Run these after migration)
 -- ============================================
 
@@ -92,9 +61,5 @@ ADD INDEX idx_status (status);
 -- Verify donation_images table exists
 -- DESCRIBE donation_images;
 
--- Verify post_flags table structure
--- DESCRIBE post_flags;
-
 -- Check existing data (should show new columns with NULL/default values)
 -- SELECT id, status, donor_phone, item_description, fulfilled_at FROM donations LIMIT 5;
--- SELECT id, reason, status, reporter_id FROM post_flags LIMIT 5;
