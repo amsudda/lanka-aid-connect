@@ -1,6 +1,7 @@
 import db from '../models/index.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { trackFailedLogin, clearLoginAttempts } from '../middleware/loginAttempts.js';
 
 const { User, NeedPost, Donation, PostFlag, PostImage } = db;
 
@@ -8,6 +9,7 @@ const { User, NeedPost, Donation, PostFlag, PostImage } = db;
 export const adminLogin = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    const clientIP = req.ip || req.connection.remoteAddress;
 
     if (!email || !password) {
       return res.status(400).json({
@@ -20,14 +22,21 @@ export const adminLogin = async (req, res, next) => {
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
+      // Track failed attempt even if user doesn't exist
+      const attemptStatus = trackFailedLogin(email);
+      console.warn(`[SECURITY] Failed admin login attempt for non-existent user: ${email} from IP: ${clientIP}`);
+
       return res.status(401).json({
         success: false,
-        message: 'Invalid credentials'
+        message: 'Invalid credentials',
+        attemptsRemaining: attemptStatus.attemptsRemaining
       });
     }
 
     // Check if user is admin
     if (user.role !== 'admin') {
+      console.warn(`[SECURITY] Non-admin user attempted admin login: ${email} from IP: ${clientIP}`);
+
       return res.status(403).json({
         success: false,
         message: 'Access denied. Admin privileges required.'
@@ -36,20 +45,42 @@ export const adminLogin = async (req, res, next) => {
 
     // Verify password
     if (!user.password) {
+      const attemptStatus = trackFailedLogin(email);
+      console.warn(`[SECURITY] Failed admin login attempt (no password set): ${email} from IP: ${clientIP}`);
+
       return res.status(401).json({
         success: false,
-        message: 'Invalid credentials'
+        message: 'Invalid credentials',
+        attemptsRemaining: attemptStatus.attemptsRemaining
       });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
+      // Track failed login attempt
+      const attemptStatus = trackFailedLogin(email);
+      console.warn(`[SECURITY] Failed admin login attempt (wrong password): ${email} from IP: ${clientIP} | Attempts remaining: ${attemptStatus.attemptsRemaining}`);
+
+      if (attemptStatus.locked) {
+        return res.status(423).json({
+          success: false,
+          message: 'Account temporarily locked due to too many failed login attempts. Please try again later.',
+          lockedUntil: attemptStatus.lockoutEnd
+        });
+      }
+
       return res.status(401).json({
         success: false,
-        message: 'Invalid credentials'
+        message: 'Invalid credentials',
+        attemptsRemaining: attemptStatus.attemptsRemaining
       });
     }
+
+    // Successful login - clear any failed attempts
+    clearLoginAttempts(email);
+
+    console.log(`[SECURITY] Successful admin login: ${email} from IP: ${clientIP}`);
 
     // Generate token
     const token = jwt.sign(
