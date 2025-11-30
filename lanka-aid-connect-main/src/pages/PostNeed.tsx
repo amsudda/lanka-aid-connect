@@ -399,6 +399,7 @@ export default function PostNeed() {
                 min={1}
                 value={formData.num_adults}
                 onChange={(e) => setFormData({ ...formData, num_adults: parseInt(e.target.value) || 1 })}
+                onFocus={(e) => e.target.select()}
                 className="h-12 rounded-xl"
               />
             </div>
@@ -410,6 +411,7 @@ export default function PostNeed() {
                 min={0}
                 value={formData.num_children}
                 onChange={(e) => setFormData({ ...formData, num_children: parseInt(e.target.value) || 0 })}
+                onFocus={(e) => e.target.select()}
                 className="h-12 rounded-xl"
               />
             </div>
@@ -421,6 +423,7 @@ export default function PostNeed() {
                 min={0}
                 value={formData.num_infants}
                 onChange={(e) => handleInfantCountChange(parseInt(e.target.value) || 0)}
+                onFocus={(e) => e.target.select()}
                 className="h-12 rounded-xl"
               />
             </div>
@@ -666,6 +669,7 @@ export default function PostNeed() {
                 const value = e.target.value === '' ? 1 : parseInt(e.target.value);
                 setFormData({ ...formData, quantity_needed: value });
               }}
+              onFocus={(e) => e.target.select()}
               className="h-12 rounded-xl"
             />
           </div>
