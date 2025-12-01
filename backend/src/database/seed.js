@@ -3,38 +3,8 @@ import { testConnection } from '../config/database.js';
 
 const { EmergencyCenter, NeedPost, PostImage } = db;
 
-const emergencyCenters = [
-  {
-    name: 'Colombo Relief Center',
-    address: 'No. 123, Galle Road, Colombo 03',
-    district: 'Colombo',
-    phone: '+94112345678',
-    location_lat: 6.9271,
-    location_lng: 79.8612,
-    needs_list: ['Food', 'Water', 'Medicines', 'Blankets'],
-    is_verified: true
-  },
-  {
-    name: 'Gampaha Emergency Relief',
-    address: 'Main Street, Gampaha',
-    district: 'Gampaha',
-    phone: '+94332234567',
-    location_lat: 7.0910,
-    location_lng: 79.9999,
-    needs_list: ['Dry Rations', 'Baby Items', 'Clothes'],
-    is_verified: true
-  },
-  {
-    name: 'Kalutara Disaster Management Center',
-    address: 'Kalutara North, Kalutara',
-    district: 'Kalutara',
-    phone: '+94342223344',
-    location_lat: 6.5854,
-    location_lng: 79.9607,
-    needs_list: ['Medical Supplies', 'Food', 'Tents'],
-    is_verified: true
-  }
-];
+// Emergency centers removed - will be added manually by admins
+// No test/sample emergency centers will be seeded
 
 const samplePosts = [
   {
@@ -110,13 +80,11 @@ const seed = async () => {
     await EmergencyCenter.destroy({ where: {} });
     await NeedPost.destroy({ where: {} });
 
-    console.log('📦 Seeding emergency centers...');
-    await EmergencyCenter.bulkCreate(emergencyCenters);
-    console.log(`✅ Created ${emergencyCenters.length} emergency centers`);
-
     console.log('📦 Seeding sample need posts...');
     await NeedPost.bulkCreate(samplePosts);
     console.log(`✅ Created ${samplePosts.length} sample need posts`);
+
+    console.log('ℹ️  Emergency centers not seeded - will be added manually by admins');
 
     console.log('\n✅ Database seeding completed successfully!');
     process.exit(0);
