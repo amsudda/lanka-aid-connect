@@ -225,17 +225,20 @@ export function NeedCard({ post }: NeedCardProps) {
       <div className="p-4 space-y-3">
         {/* Title and name */}
         <div>
-          <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-foreground text-lg leading-tight">
-              {post.title}
-            </h3>
+          <h3 className="font-semibold text-foreground text-lg leading-tight">
+            {post.title}
+          </h3>
+          <div className="flex items-center gap-2 mt-1">
+            <p className="text-sm text-muted-foreground">
+              Posted by {post.victim_name}
+            </p>
             {post.is_verified && (
-              <BadgeCheck className="w-5 h-5 text-blue-500 flex-shrink-0" fill="currentColor" />
+              <Badge className="bg-blue-500 text-white hover:bg-blue-600 flex items-center gap-1 text-xs px-2 py-0.5">
+                <BadgeCheck className="w-3 h-3" fill="currentColor" />
+                Verified
+              </Badge>
             )}
           </div>
-          <p className="text-sm text-muted-foreground mt-1">
-            Posted by {post.victim_name}
-          </p>
         </div>
 
         {/* Location and time */}

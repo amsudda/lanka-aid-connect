@@ -11,7 +11,7 @@ import { postsAPI, donationsAPI, authAPI } from "@/services/api";
 import { NeedPost, Donation, CATEGORY_LABELS, CATEGORY_ICONS, NeedCategory } from "@/types/database";
 import {
   MapPin, Phone, MessageCircle, Clock, ChevronLeft, ChevronRight as ChevronRightIcon,
-  Heart, User, Loader2, Navigation, Camera, Image as ImageIcon, X, Users, Baby, Images
+  Heart, User, Loader2, Navigation, Camera, Image as ImageIcon, X, Users, Baby, Images, BadgeCheck
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
@@ -333,8 +333,16 @@ export default function NeedDetail() {
       <div className="px-4 py-6 space-y-6 -mt-6 relative bg-background rounded-t-3xl">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold text-foreground">{post.title}</h1>
-          <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+          <div className="flex items-start gap-3 mb-2">
+            <h1 className="text-2xl font-bold text-foreground flex-1">{post.title}</h1>
+            {post.is_verified && (
+              <Badge className="bg-blue-500 text-white hover:bg-blue-600 flex items-center gap-1.5 text-sm px-3 py-1.5 shrink-0">
+                <BadgeCheck className="w-4 h-4" fill="currentColor" />
+                Verified by Admin
+              </Badge>
+            )}
+          </div>
+          <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
               <User className="w-4 h-4" />
               {post.victim_name}
