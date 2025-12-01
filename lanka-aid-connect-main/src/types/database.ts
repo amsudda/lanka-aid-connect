@@ -8,6 +8,8 @@ export interface NeedPost {
   whatsapp_link: string | null;
   location_district: string;
   location_city: string | null;
+  location_landmark: string | null;
+  location_description: string | null;
   location_lat: number | null;
   location_lng: number | null;
   category: NeedCategory;
@@ -19,6 +21,13 @@ export interface NeedPost {
   edit_pin: string;
   flag_count: number;
   voice_note_url: string | null;
+  is_verified: boolean;
+  num_adults: number;
+  num_children: number;
+  num_infants: number;
+  infant_ages: number[] | null;
+  is_group_request: boolean;
+  group_size: number | null;
   created_at: string;
   updated_at: string;
   images?: PostImage[];

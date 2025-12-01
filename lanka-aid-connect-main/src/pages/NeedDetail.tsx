@@ -11,7 +11,7 @@ import { postsAPI, donationsAPI, authAPI } from "@/services/api";
 import { NeedPost, Donation, CATEGORY_LABELS, CATEGORY_ICONS, NeedCategory } from "@/types/database";
 import {
   MapPin, Phone, MessageCircle, Clock, ChevronLeft,
-  Heart, User, Loader2, Navigation, Camera, Image as ImageIcon, X
+  Heart, User, Loader2, Navigation, Camera, Image as ImageIcon, X, Users, Baby
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
@@ -304,6 +304,64 @@ export default function NeedDetail() {
             <span className="text-sm text-muted-foreground">items received</span>
           </div>
         </div>
+
+        {/* Family Composition */}
+        {(post.is_group_request || post.num_adults > 0 || post.num_children > 0 || post.num_infants > 0) && (
+          <div className="bg-card rounded-2xl p-4 border border-border/50">
+            <div className="flex items-center gap-2 mb-3">
+              <Users className="w-5 h-5 text-primary" />
+              <h3 className="font-semibold text-foreground">
+                {post.is_group_request ? "Group Request" : "Family Composition"}
+              </h3>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {post.is_group_request && post.group_size ? (
+                <div className="col-span-2 bg-primary/5 rounded-xl p-3 border border-primary/20">
+                  <p className="text-sm text-muted-foreground">Group Size</p>
+                  <p className="text-lg font-bold text-foreground">{post.group_size} people</p>
+                </div>
+              ) : (
+                <>
+                  {post.num_adults > 0 && (
+                    <div className="bg-muted/50 rounded-xl p-3">
+                      <p className="text-sm text-muted-foreground">Adults</p>
+                      <p className="text-lg font-bold text-foreground">{post.num_adults}</p>
+                    </div>
+                  )}
+                  {post.num_children > 0 && (
+                    <div className="bg-muted/50 rounded-xl p-3">
+                      <p className="text-sm text-muted-foreground">Children</p>
+                      <p className="text-lg font-bold text-foreground">{post.num_children}</p>
+                    </div>
+                  )}
+                  {post.num_infants > 0 && (
+                    <div className="bg-muted/50 rounded-xl p-3">
+                      <div className="flex items-center gap-1">
+                        <Baby className="w-4 h-4 text-primary" />
+                        <p className="text-sm text-muted-foreground">Infants</p>
+                      </div>
+                      <p className="text-lg font-bold text-foreground">{post.num_infants}</p>
+                      {post.infant_ages && post.infant_ages.length > 0 && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Ages: {post.infant_ages.join(", ")} months
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+            <div className="mt-3 pt-3 border-t border-border/50">
+              <p className="text-sm text-muted-foreground">
+                Total people: <span className="font-semibold text-foreground">
+                  {post.is_group_request
+                    ? post.group_size
+                    : post.num_adults + post.num_children + post.num_infants}
+                </span>
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Location */}
         <div className="bg-card rounded-2xl p-4 border border-border/50">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MapPin, MessageCircle, Clock, Flag, ChevronRight, Bookmark, BadgeCheck } from "lucide-react";
+import { MapPin, MessageCircle, Clock, Flag, ChevronRight, Bookmark, BadgeCheck, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { NeedPost as APIPost, postsAPI } from "@/services/api";
@@ -171,6 +171,25 @@ export function NeedCard({ post }: NeedCardProps) {
         <p className="text-sm text-foreground/80 line-clamp-2">
           {post.description}
         </p>
+
+        {/* Family Composition */}
+        {(post.is_group_request || post.num_adults > 0 || post.num_children > 0 || post.num_infants > 0) && (
+          <div className="flex items-center gap-2 px-3 py-2 bg-primary/5 rounded-lg border border-primary/20">
+            <Users className="w-4 h-4 text-primary" />
+            <span className="text-sm text-foreground">
+              {post.is_group_request && post.group_size ? (
+                <>Group of <span className="font-semibold">{post.group_size} people</span></>
+              ) : (
+                <>
+                  Family of <span className="font-semibold">
+                    {post.num_adults + post.num_children + post.num_infants}
+                  </span>
+                  {post.num_adults > 0 && <span className="text-muted-foreground ml-1">({post.num_adults} adults{post.num_children > 0 && `, ${post.num_children} children`}{post.num_infants > 0 && `, ${post.num_infants} infants`})</span>}
+                </>
+              )}
+            </span>
+          </div>
+        )}
 
         {/* Progress bar */}
         <div className="space-y-2">
