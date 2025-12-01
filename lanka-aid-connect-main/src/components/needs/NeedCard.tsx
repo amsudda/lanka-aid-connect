@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { MapPin, MessageCircle, Clock, Flag, ChevronRight, Bookmark, BadgeCheck, Users } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { MapPin, MessageCircle, Clock, Flag, ChevronRight, Bookmark, BadgeCheck, Users, ChevronLeft, Images } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { NeedPost as APIPost, postsAPI } from "@/services/api";
@@ -25,14 +25,66 @@ const categoryBadgeClasses: Record<NeedCategory, string> = {
 export function NeedCard({ post }: NeedCardProps) {
   const [imageIndex, setImageIndex] = useState(0);
   const [isSaved, setIsSaved] = useState(false);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
+  const imageContainerRef = useRef<HTMLDivElement>(null);
+
   const progress = Math.min((post.quantity_donated / post.quantity_needed) * 100, 100);
   const isUrgent = progress < 25;
   const isAlmostComplete = progress >= 75;
   const isComplete = progress >= 100;
 
+  const images = post.images || [];
+  const hasMultipleImages = images.length > 1;
+
   useEffect(() => {
     setIsSaved(postsAPI.isPostSaved(post.id));
   }, [post.id]);
+
+  // Navigation functions
+  const nextImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setImageIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const prevImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setImageIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  // Touch handlers for swipe
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe && hasMultipleImages) {
+      e.preventDefault();
+      e.stopPropagation();
+      setImageIndex((prev) => (prev + 1) % images.length);
+    }
+
+    if (isRightSwipe && hasMultipleImages) {
+      e.preventDefault();
+      e.stopPropagation();
+      setImageIndex((prev) => (prev - 1 + images.length) % images.length);
+    }
+
+    setTouchStart(0);
+    setTouchEnd(0);
+  };
 
   const handleToggleSave = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -60,7 +112,6 @@ export function NeedCard({ post }: NeedCardProps) {
     return "progress-urgent";
   };
 
-  const images = post.images || [];
   const getImageUrl = (imageUrl: string) => {
     if (!imageUrl) return "/placeholder.svg";
     // If it's already a full URL, return as is
@@ -75,16 +126,53 @@ export function NeedCard({ post }: NeedCardProps) {
   return (
     <article className="bg-card rounded-2xl shadow-md overflow-hidden border border-border/50 animate-in">
       {/* Image Carousel */}
-      <div className="relative aspect-[4/3] bg-muted overflow-hidden">
+      <div
+        ref={imageContainerRef}
+        className="relative aspect-[4/3] bg-muted overflow-hidden group"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         <img
           src={displayImage}
           alt={post.title}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transition-opacity duration-300"
         />
-        
+
+        {/* Navigation Arrows (Desktop) */}
+        {hasMultipleImages && (
+          <>
+            <button
+              onClick={prevImage}
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+              aria-label="Previous image"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={nextImage}
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+              aria-label="Next image"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </>
+        )}
+
+        {/* Image Counter Badge */}
+        {hasMultipleImages && (
+          <div className="absolute top-3 left-3 flex items-center gap-1 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-white text-xs font-medium z-10">
+            <Images className="w-3 h-3" />
+            {imageIndex + 1}/{images.length}
+          </div>
+        )}
+
         {/* Urgency indicator */}
         {isUrgent && !isComplete && (
-          <div className="absolute top-3 left-3">
+          <div className={cn(
+            "absolute top-3 z-10",
+            hasMultipleImages ? "left-20" : "left-3"
+          )}>
             <Badge variant="destructive" className="pulse-urgent font-semibold">
               Urgent
             </Badge>
@@ -100,18 +188,23 @@ export function NeedCard({ post }: NeedCardProps) {
         )}
 
         {/* Image dots */}
-        {images.length > 1 && (
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+        {hasMultipleImages && (
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-full">
             {images.map((_, idx) => (
               <button
                 key={idx}
-                onClick={() => setImageIndex(idx)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setImageIndex(idx);
+                }}
                 className={cn(
                   "w-2 h-2 rounded-full transition-all",
                   idx === imageIndex
-                    ? "bg-white w-4"
+                    ? "bg-white w-6"
                     : "bg-white/50 hover:bg-white/75"
                 )}
+                aria-label={`Go to image ${idx + 1}`}
               />
             ))}
           </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Button } from "@/components/ui/button";
@@ -10,8 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { postsAPI, donationsAPI, authAPI } from "@/services/api";
 import { NeedPost, Donation, CATEGORY_LABELS, CATEGORY_ICONS, NeedCategory } from "@/types/database";
 import {
-  MapPin, Phone, MessageCircle, Clock, ChevronLeft,
-  Heart, User, Loader2, Navigation, Camera, Image as ImageIcon, X, Users, Baby
+  MapPin, Phone, MessageCircle, Clock, ChevronLeft, ChevronRight as ChevronRightIcon,
+  Heart, User, Loader2, Navigation, Camera, Image as ImageIcon, X, Users, Baby, Images
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
@@ -36,6 +36,9 @@ export default function NeedDetail() {
   const [activeImage, setActiveImage] = useState(0);
   const [donateOpen, setDonateOpen] = useState(false);
   const [donating, setDonating] = useState(false);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
+  const imageContainerRef = useRef<HTMLDivElement>(null);
   const [donateForm, setDonateForm] = useState({
     quantity: 1,
     message: "",
@@ -90,6 +93,47 @@ export default function NeedDetail() {
     } catch (error) {
       console.error("Error fetching donations:", error);
     }
+  };
+
+  // Image navigation functions
+  const nextImage = () => {
+    if (images.length > 1) {
+      setActiveImage((prev) => (prev + 1) % images.length);
+    }
+  };
+
+  const prevImage = () => {
+    if (images.length > 1) {
+      setActiveImage((prev) => (prev - 1 + images.length) % images.length);
+    }
+  };
+
+  // Touch handlers for swipe
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe && images.length > 1) {
+      nextImage();
+    }
+
+    if (isRightSwipe && images.length > 1) {
+      prevImage();
+    }
+
+    setTouchStart(0);
+    setTouchEnd(0);
   };
 
   const handleProofImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -193,7 +237,13 @@ export default function NeedDetail() {
     <PageLayout showHeader={false}>
       {/* Image Gallery */}
       <div className="relative">
-        <div className="aspect-square bg-muted">
+        <div
+          ref={imageContainerRef}
+          className="aspect-square bg-muted relative group"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           <img
             src={
               images[activeImage]?.image_url
@@ -203,29 +253,58 @@ export default function NeedDetail() {
                 : "/placeholder.svg"
             }
             alt={post.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-opacity duration-300"
           />
+
+          {/* Navigation Arrows */}
+          {images.length > 1 && (
+            <>
+              <button
+                onClick={prevImage}
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70 z-10"
+                aria-label="Previous image"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <button
+                onClick={nextImage}
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70 z-10"
+                aria-label="Next image"
+              >
+                <ChevronRightIcon className="w-6 h-6" />
+              </button>
+            </>
+          )}
+
+          {/* Image Counter Badge */}
+          {images.length > 1 && (
+            <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-sm text-white text-sm font-medium z-10">
+              <Images className="w-4 h-4" />
+              {activeImage + 1}/{images.length}
+            </div>
+          )}
         </div>
 
         {/* Back button */}
         <button
           onClick={() => navigate(-1)}
-          className="absolute top-4 left-4 p-2 bg-black/30 backdrop-blur-sm rounded-full text-white"
+          className="absolute top-4 left-4 p-2 bg-black/30 backdrop-blur-sm rounded-full text-white z-10"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
 
         {/* Image indicators */}
         {images.length > 1 && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 bg-black/30 backdrop-blur-sm px-4 py-2 rounded-full z-10">
             {images.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setActiveImage(idx)}
                 className={cn(
-                  "w-2 h-2 rounded-full transition-all",
-                  idx === activeImage ? "bg-white w-6" : "bg-white/50"
+                  "w-2.5 h-2.5 rounded-full transition-all",
+                  idx === activeImage ? "bg-white w-8" : "bg-white/50 hover:bg-white/75"
                 )}
+                aria-label={`Go to image ${idx + 1}`}
               />
             ))}
           </div>
